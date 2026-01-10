@@ -5,18 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medha Sanitary Inventory Manager</title>
 
-  <!-- Google APIs (keep as-is if you use them later) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Load Google APIs synchronously (removed async defer) -->
+  <script src="https://accounts.google.com/gsi/client"></script>
   <script src="https://apis.google.com/js/api.js"></script>
 
-  <!-- IMPORTANT: paths are relative to /public -->
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <div class="container">
     <header>
-      <img src="/medha-logo.png" alt="Medha ERP Logo" class="logo" />
-      <h1> Sanitary Inventory Manager</h1>
+      <img src="https://i.ibb.co/Txm0HKMy/Medha-ERP-By-Marketing-Dime.png" alt="Medha ERP Logo" class="logo" />
+      <h1>🛁 Sanitary Inventory Manager</h1>
       <button id="connect-sheet" class="btn-primary">🔗 Connect Google Sheet</button>
       <div id="status" class="status"></div>
     </header>
@@ -119,7 +118,7 @@
     </div>
   </div>
 
-  <!-- IMPORTANT: JS path from /public -->
+  <!-- Load inventory.js LAST -->
   <script src="/inventory.js"></script>
 </body>
 </html>
