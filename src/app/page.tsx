@@ -1,11 +1,19 @@
+import React from "react";
+
 export default function Home() {
   return (
-    <iframe 
-      src="/inventory.html" 
-      width="100%" 
-      height="100vh" 
-      style={{border: 'none'}}
-      title="Medha Inventory"
-    />
+    <main style={{ margin: 0, padding: 0 }}>
+      <iframe
+        src="/inventory.html"
+        style={{
+          border: "none",
+          display: "block",
+          width: "100vw",
+          height: "100vh",
+          background: "#f5f5f5",
+        }}
+        title="Medha Inventory"
+      />
+    </main>
   );
 }

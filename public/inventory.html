@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medha Sanitary Inventory Manager</title>
+
+  <!-- Google APIs (keep as-is if you use them later) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js"></script>
-  <link rel="stylesheet" href="/styles.css">
+
+  <!-- IMPORTANT: paths are relative to /public -->
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <div class="container">
     <header>
-      <img src="https://i.ibb.co/Txm0HKMy/Medha-ERP-By-Marketing-Dime.png" alt="Medha ERP Logo" class="logo">
+      <img src="/medha-logo.png" alt="Medha ERP Logo" class="logo" />
       <h1> Sanitary Inventory Manager</h1>
       <button id="connect-sheet" class="btn-primary">🔗 Connect Google Sheet</button>
       <div id="status" class="status"></div>
@@ -25,70 +29,97 @@
       <button class="tab" data-tab="bills">📄 Bills</button>
     </nav>
 
-    <!-- INVENTORY TAB -->
+    <!-- Inventory tab -->
     <div id="inventory-tab" class="tab-content active">
       <table id="inventory-table">
-        <thead><tr><th>ID</th><th>Name</th><th>SKU</th><th>Stock</th><th>Cost ₹</th><th>Sale ₹</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr>
+            <th>ID</th><th>Name</th><th>SKU</th><th>Stock</th>
+            <th>Cost ₹</th><th>Sale ₹</th><th>Actions</th>
+          </tr>
+        </thead>
         <tbody></tbody>
       </table>
       <form id="add-item" class="form-grid">
-        <input placeholder="Faucet, Pipe, Tap" required>
-        <input placeholder="SKU123" required>
-        <input type="number" placeholder="Stock" min="0" required>
-        <input type="number" placeholder="Cost ₹" step="0.01">
-        <input type="number" placeholder="Sale ₹" step="0.01">
+        <input placeholder="Faucet, Pipe, Tap" required />
+        <input placeholder="SKU123" required />
+        <input type="number" placeholder="Stock" min="0" required />
+        <input type="number" placeholder="Cost ₹" step="0.01" />
+        <input type="number" placeholder="Sale ₹" step="0.01" />
         <button type="submit">➕ Add Item</button>
       </form>
     </div>
 
-    <!-- PURCHASES TAB -->
+    <!-- Purchases tab -->
     <div id="purchases-tab" class="tab-content">
       <table id="purchases-table">
-        <thead><tr><th>Date</th><th>Supplier</th><th>Item</th><th>Qty</th><th>Cost ₹</th><th>Total ₹</th><th>Status</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Date</th><th>Supplier</th><th>Item</th>
+            <th>Qty</th><th>Cost ₹</th><th>Total ₹</th><th>Status</th>
+          </tr>
+        </thead>
         <tbody></tbody>
       </table>
       <form id="add-purchase" class="form-grid">
-        <input type="date" required>
-        <input placeholder="Supplier Name" required>
+        <input type="date" required />
+        <input placeholder="Supplier Name" required />
         <select id="purchase-items" required><option>Loading...</option></select>
-        <input type="number" placeholder="Qty" min="1" required>
-        <input type="number" placeholder="Cost ₹/unit" step="0.01" required>
+        <input type="number" placeholder="Qty" min="1" required />
+        <input type="number" placeholder="Cost ₹/unit" step="0.01" required />
         <button type="submit">➕ Add Purchase</button>
       </form>
     </div>
 
-    <!-- SALES TAB -->
+    <!-- Sales tab -->
     <div id="sales-tab" class="tab-content">
       <table id="sales-table">
-        <thead><tr><th>Date</th><th>Customer</th><th>Item</th><th>Qty</th><th>Sale ₹</th><th>Total ₹</th><th>Status</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Date</th><th>Customer</th><th>Item</th>
+            <th>Qty</th><th>Sale ₹</th><th>Total ₹</th><th>Status</th>
+          </tr>
+        </thead>
         <tbody></tbody>
       </table>
       <form id="add-sale" class="form-grid">
-        <input type="date" required>
-        <input placeholder="Customer Name" required>
+        <input type="date" required />
+        <input placeholder="Customer Name" required />
         <select id="sale-items" required><option>Loading...</option></select>
-        <input type="number" placeholder="Qty" min="1" required>
-        <input type="number" placeholder="Sale ₹/unit" step="0.01" required>
+        <input type="number" placeholder="Qty" min="1" required />
+        <input type="number" placeholder="Sale ₹/unit" step="0.01" required />
         <button type="submit">➕ Add Sale</button>
       </form>
     </div>
 
-    <!-- INVOICES TAB -->
+    <!-- Invoices tab -->
     <div id="invoices-tab" class="tab-content">
       <table id="invoices-table">
-        <thead><tr><th>ID</th><th>Customer</th><th>Date</th><th>Total ₹</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr>
+            <th>ID</th><th>Customer</th><th>Date</th>
+            <th>Total ₹</th><th>Due Date</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
         <tbody></tbody>
       </table>
     </div>
 
-    <!-- BILLS TAB -->
+    <!-- Bills tab -->
     <div id="bills-tab" class="tab-content">
       <table id="bills-table">
-        <thead><tr><th>ID</th><th>Supplier</th><th>Date</th><th>Total ₹</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead>
+          <tr>
+            <th>ID</th><th>Supplier</th><th>Date</th>
+            <th>Total ₹</th><th>Due Date</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
         <tbody></tbody>
       </table>
     </div>
   </div>
+
+  <!-- IMPORTANT: JS path from /public -->
   <script src="/inventory.js"></script>
 </body>
 </html>
