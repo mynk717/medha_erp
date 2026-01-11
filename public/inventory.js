@@ -19,7 +19,7 @@ window.addEventListener('load', function() {
 function initGapi() {
   gapi.load('client', async () => {
     await gapi.client.init({
-      apiKey: 'YOUR_API_KEY_HERE', // ← PASTE YOUR REAL API KEY
+      apiKey: 'AIzaSyDiiKczgqa9NBPVwKkkSaOsIKyCOvZsoCI',
       discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
     });
     gapiReady = true;
