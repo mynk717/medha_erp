@@ -10,6 +10,7 @@ import Invoices from '../components/erp/Invoices';
 import Bills from '../components/erp/Bills';
 import Settings from '../components/erp/Settings';
 import Image from 'next/image';
+import Reminders from '../components/erp/Reminders';
 import { 
   LayoutDashboard, 
   Package, 
@@ -20,7 +21,8 @@ import {
   Settings as SettingsIcon,
   Link,
   CheckCircle,
-  Loader2
+  Loader2,
+  Bell
 } from 'lucide-react';
 
 export default function ERPPage() {
@@ -113,6 +115,7 @@ export default function ERPPage() {
     { id: 'purchases', label: 'Purchases', icon: ShoppingBag },
     { id: 'invoices', label: 'Invoices', icon: FileText },
     { id: 'bills', label: 'Bills', icon: Receipt },
+    { id: 'reminders', label: 'Reminders', icon: Bell },
     { id: 'settings', label: 'Settings', icon: SettingsIcon }
   ];
 
@@ -124,6 +127,7 @@ export default function ERPPage() {
       case 'purchases': return <Purchases />;
       case 'invoices': return <Invoices />;
       case 'bills': return <Bills />;
+      case 'reminders': return <Reminders />;
       case 'settings': return <Settings />;
       default: return <Dashboard onTabSwitch={setActiveTab} />;
     }

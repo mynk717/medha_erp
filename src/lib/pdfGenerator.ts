@@ -1,129 +1,250 @@
-// src/lib/pdfGenerator.ts
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Invoice, Bill, BusinessSettings } from '@/types/erp';
-import { formatCurrency } from './calculations';
+import { Bill, Invoice, BusinessSettings } from '@/types/erp';
 
-export function generateInvoicePDF(invoice: Invoice, settings: BusinessSettings) {
+export const generateBillPDF = async (bill: Bill, settings?: BusinessSettings) => {
   const doc = new jsPDF();
   
-  // Header with company name
+  // Header
+  doc.setFontSize(22);
+  doc.setTextColor(30, 64, 175);
+  doc.text('BILL', doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+  
+  doc.setFontSize(12);
+  doc.setTextColor(100, 116, 139);
+  doc.text(settings?.name || 'Medha Sanitary & Hardware', doc.internal.pageSize.getWidth() / 2, 28, { align: 'center' });
+  
+  // Bill Details Box
+  doc.setFillColor(249, 250, 251);
+  doc.rect(15, 40, 180, 40, 'F');
+  
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Bill ID', 20, 48);
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(11);
+  doc.text(bill.id, 20, 54);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Date', 110, 48);
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(11);
+  doc.text(bill.date, 110, 54);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Supplier', 20, 63);
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(11);
+  doc.text(bill.supplier, 20, 69);
+  
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Due Date', 110, 63);
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(11);
+  doc.text(bill.dueDate, 110, 69);
+  
+  let yPos = 90;
+  
+  // GST Breakdown if available
+  if (bill.subtotal && settings?.gstEnabled) {
+    doc.setFillColor(249, 250, 251);
+    doc.rect(15, yPos, 180, 40, 'F');
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Subtotal', 20, yPos + 8);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`₹${bill.subtotal.toFixed(2)}`, 175, yPos + 8, { align: 'right' });
+    
+    if (bill.cgst && bill.sgst) {
+      doc.setTextColor(100, 116, 139);
+      doc.text(`CGST (${(bill.gstRate || 0) / 2}%)`, 20, yPos + 16);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`₹${bill.cgst.toFixed(2)}`, 175, yPos + 16, { align: 'right' });
+      
+      doc.setTextColor(100, 116, 139);
+      doc.text(`SGST (${(bill.gstRate || 0) / 2}%)`, 20, yPos + 24);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`₹${bill.sgst.toFixed(2)}`, 175, yPos + 24, { align: 'right' });
+    } else if (bill.igst) {
+      doc.setTextColor(100, 116, 139);
+      doc.text(`IGST (${bill.gstRate || 0}%)`, 20, yPos + 16);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`₹${bill.igst.toFixed(2)}`, 175, yPos + 16, { align: 'right' });
+    }
+    
+    yPos += 45;
+  }
+  
+  // Total Amount Box
+  doc.setFillColor(249, 250, 251);
+  doc.rect(15, yPos, 180, 25, 'F');
+  
+  doc.setFontSize(12);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Total Amount', 20, yPos + 10);
+  
   doc.setFontSize(20);
   doc.setTextColor(30, 64, 175);
-  doc.text(settings.name, 15, 20);
+  doc.text(`₹${bill.total.toFixed(2)}`, 175, yPos + 17, { align: 'right' });
   
-  doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.text(settings.address, 15, 28);
-  doc.text(`GST: ${settings.gstNumber} | Phone: ${settings.phone}`, 15, 34);
+  yPos += 35;
   
-  // Invoice title
-  doc.setFontSize(16);
-  doc.setTextColor(30, 64, 175);
-  doc.text('TAX INVOICE', 150, 20);
-  
-  // Invoice details box
-  doc.setFontSize(10);
-  doc.text(`Invoice #: ${invoice.id}`, 150, 28);
-  doc.text(`Date: ${invoice.date}`, 150, 34);
-  doc.text(`Due Date: ${invoice.dueDate}`, 150, 40);
-  
-  // Bill to section
-  doc.setFontSize(12);
-  doc.setTextColor(30, 64, 175);
-  doc.text('Bill To:', 15, 50);
-  
-  doc.setFontSize(10);
-  doc.setTextColor(0, 0, 0);
-  doc.text(invoice.customer, 15, 56);
-  doc.text(invoice.customerPhone || '', 15, 62);
-  
-  // Items table
-  autoTable(doc, {
-    startY: 70,
-    head: [['Item', 'Qty', 'Rate', 'Amount']],
-    body: invoice.items.map(item => [
-      item.name,
-      item.qty.toString(),
-      formatCurrency(item.rate),
-      formatCurrency(item.amount)
-    ]),
-    theme: 'grid',
-    headStyles: { fillColor: [30, 64, 175], textColor: [255, 255, 255] },
-  });
-  
-  // Totals section
-  const finalY = (doc as any).lastAutoTable.finalY + 10;
-  const totalsX = 130;
-  
-  doc.text(`Subtotal:`, totalsX, finalY);
-  doc.text(formatCurrency(invoice.subtotal), 180, finalY, { align: 'right' });
-  
-  if (invoice.cgst > 0) {
-    doc.text(`CGST (9%):`, totalsX, finalY + 6);
-    doc.text(formatCurrency(invoice.cgst), 180, finalY + 6, { align: 'right' });
-    
-    doc.text(`SGST (9%):`, totalsX, finalY + 12);
-    doc.text(formatCurrency(invoice.sgst), 180, finalY + 12, { align: 'right' });
+  // Notes
+  if (bill.notes) {
+    doc.setFillColor(254, 243, 199);
+    doc.rect(15, yPos, 180, 20, 'F');
+    doc.setFontSize(10);
+    doc.setTextColor(146, 64, 14);
+    doc.text('Notes:', 20, yPos + 8);
+    doc.setTextColor(120, 53, 15);
+    doc.text(bill.notes, 20, yPos + 15, { maxWidth: 170 });
   }
-  
-  if (invoice.igst > 0) {
-    doc.text(`IGST (18%):`, totalsX, finalY + 6);
-    doc.text(formatCurrency(invoice.igst), 180, finalY + 6, { align: 'right' });
-  }
-  
-  doc.text(`Round Off:`, totalsX, finalY + 18);
-  doc.text(formatCurrency(invoice.roundOff), 180, finalY + 18, { align: 'right' });
-  
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`Total:`, totalsX, finalY + 26);
-  doc.text(formatCurrency(invoice.total), 180, finalY + 26, { align: 'right' });
-  
-  // Terms & conditions
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Terms & Conditions:', 15, finalY + 40);
-  const terms = settings.invoiceTerms.split('\n');
-  terms.forEach((term, i) => {
-    doc.text(term, 15, finalY + 46 + (i * 5));
-  });
   
   // Footer
-  doc.setTextColor(100, 100, 100);
-  doc.text('Thank you for your business!', 105, 280, { align: 'center' });
+  const footerY = doc.internal.pageSize.getHeight() - 20;
+  doc.setFontSize(9);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Generated by Medha ERP System', doc.internal.pageSize.getWidth() / 2, footerY, { align: 'center' });
   
-  return doc;
-}
+  doc.save(`Bill_${bill.id}_${bill.supplier}.pdf`);
+};
 
-export function downloadInvoicePDF(invoice: Invoice, settings: BusinessSettings) {
-  const doc = generateInvoicePDF(invoice, settings);
-  doc.save(`Invoice-${invoice.id}.pdf`);
-}
-
-export function generateBillPDF(bill: Bill, settings: BusinessSettings) {
+export const downloadInvoicePDF = async (invoice: Invoice, settings?: BusinessSettings) => {
   const doc = new jsPDF();
   
-  doc.setFontSize(20);
+  // Header
+  doc.setFontSize(24);
   doc.setTextColor(30, 64, 175);
-  doc.text('PURCHASE BILL', 105, 20, { align: 'center' });
+  doc.text('TAX INVOICE', doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
   
-  doc.setFontSize(10);
-  doc.text(`Bill #: ${bill.id}`, 15, 35);
-  doc.text(`Date: ${bill.date}`, 15, 41);
-  doc.text(`Supplier: ${bill.supplier}`, 15, 47);
-  doc.text(`Amount: ${formatCurrency(bill.total)}`, 15, 53);
-  doc.text(`Due Date: ${bill.dueDate}`, 15, 59);
-  doc.text(`Status: ${bill.status}`, 15, 65);
+  // Business Details
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text(settings?.name || 'Medha Sanitary & Hardware', 15, 35);
   
-  if (bill.notes) {
-    doc.text(`Notes: ${bill.notes}`, 15, 71);
+  if (settings?.address) {
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text(settings.address, 15, 41, { maxWidth: 80 });
   }
   
-  return doc;
-}
+  if (settings?.gstNumber) {
+    doc.text(`GST: ${settings.gstNumber}`, 15, 51);
+  }
+  
+  if (settings?.phone) {
+    doc.text(`Phone: ${settings.phone}`, 15, 56);
+  }
+  
+  // Invoice Details Box
+  doc.setFillColor(249, 250, 251);
+  doc.rect(120, 35, 75, 25, 'F');
+  
+  doc.setFontSize(9);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Invoice No:', 125, 41);
+  doc.setTextColor(0, 0, 0);
+  doc.text(invoice.id, 160, 41);
+  
+  doc.setTextColor(100, 116, 139);
+  doc.text('Date:', 125, 47);
+  doc.setTextColor(0, 0, 0);
+  doc.text(invoice.date, 160, 47);
+  
+  doc.setTextColor(100, 116, 139);
+  doc.text('Due Date:', 125, 53);
+  doc.setTextColor(0, 0, 0);
+  doc.text(invoice.dueDate, 160, 53);
+  
+  // Customer Details
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Bill To:', 15, 70);
+  doc.setFontSize(11);
+  doc.setTextColor(0, 0, 0);
+  doc.text(invoice.customer, 15, 76);
+  
+  // Items Table
+  const tableData = invoice.items.map(item => [
+    item.name,
+    item.qty.toString(),
+    `₹${item.rate.toFixed(2)}`,
+    `₹${item.amount.toFixed(2)}`
+  ]);
+  
+  autoTable(doc, {
+    startY: 85,
+    head: [['Item', 'Qty', 'Rate', 'Amount']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: { fillColor: [102, 126, 234] },
+    styles: { fontSize: 10 },
+  });
+  
+  const finalY = (doc as any).lastAutoTable.finalY + 10;
+  
+  // Tax Breakdown
+  const taxBoxX = 120;
+  let taxY = finalY;
+  
+  doc.setFontSize(10);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Subtotal:', taxBoxX, taxY);
+  doc.setTextColor(0, 0, 0);
+  doc.text(`₹${invoice.subtotal.toFixed(2)}`, 190, taxY, { align: 'right' });
+  
+  if (settings?.gstEnabled && invoice.gstRate) {
+    taxY += 7;
+    
+    if (invoice.cgst && invoice.sgst) {
+      doc.setTextColor(100, 116, 139);
+      doc.text(`CGST (${invoice.gstRate / 2}%):`, taxBoxX, taxY);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`₹${invoice.cgst.toFixed(2)}`, 190, taxY, { align: 'right' });
+      
+      taxY += 7;
+      doc.setTextColor(100, 116, 139);
+      doc.text(`SGST (${invoice.gstRate / 2}%):`, taxBoxX, taxY);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`₹${invoice.sgst.toFixed(2)}`, 190, taxY, { align: 'right' });
+    } else if (invoice.igst) {
+      doc.setTextColor(100, 116, 139);
+      doc.text(`IGST (${invoice.gstRate}%):`, taxBoxX, taxY);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`₹${invoice.igst.toFixed(2)}`, 190, taxY, { align: 'right' });
+    }
+  }
+  
+  taxY += 10;
+  doc.setDrawColor(200, 200, 200);
+  doc.line(taxBoxX, taxY, 195, taxY);
+  
+  taxY += 7;
+  doc.setFontSize(14);
+  doc.setTextColor(30, 64, 175);
+  doc.text('Total:', taxBoxX, taxY);
+  doc.text(`₹${invoice.total.toFixed(2)}`, 190, taxY, { align: 'right' });
+  
+  // Terms
+  if (settings?.invoiceTerms) {
+    doc.setFontSize(8);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Terms & Conditions:', 15, doc.internal.pageSize.getHeight() - 35);
+    doc.setFontSize(7);
+    doc.text(settings.invoiceTerms, 15, doc.internal.pageSize.getHeight() - 30, { maxWidth: 180 });
+  }
+  
+  // Footer
+  doc.setFontSize(9);
+  doc.setTextColor(100, 116, 139);
+  doc.text('Generated by Medha ERP System', doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+  
+  doc.save(`Invoice_${invoice.id}_${invoice.customer}.pdf`);
+};
 
-export function downloadBillPDF(bill: Bill, settings: BusinessSettings) {
-  const doc = generateBillPDF(bill, settings);
-  doc.save(`Bill-${bill.id}.pdf`);
-}
+// Alias for compatibility
+export const generateInvoicePDF = downloadInvoicePDF;

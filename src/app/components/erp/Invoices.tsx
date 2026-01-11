@@ -1,12 +1,20 @@
-// src/app/components/erp/Invoices.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import { Invoice, Sale, BusinessSettings } from '@/types/erp';
 import { GoogleSheetsService } from '@/lib/googleSheets';
 import { formatCurrency, calculateGST } from '@/lib/calculations';
-import { generateInvoiceWhatsAppLink } from '@/lib/whatsappHelper';
+import { WhatsAppHelper } from '@/lib/whatsappHelper';
 import { downloadInvoicePDF } from '@/lib/pdfGenerator';
+import { 
+  FileText, 
+  Download, 
+  Send, 
+  Eye, 
+  Printer,
+  AlertCircle,
+  Loader2
+} from 'lucide-react';
 
 export default function Invoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -33,24 +41,41 @@ export default function Invoices() {
     }
   };
 
-  const loadSettings = () => {
-    const stored = localStorage.getItem('businessSettings');
-    if (stored) {
-      setBusinessSettings(JSON.parse(stored));
+  const loadSettings = async () => {
+    try {
+      const sheets = GoogleSheetsService.getInstance();
+      const settingsData = await sheets.getRange('Settings!A2:I2');
+      if (settingsData.length > 0) {
+        const row = settingsData[0];
+        const settings: BusinessSettings = {
+          name: row[0] || 'Medha Sanitary & Hardware',
+          gstNumber: row[1] || '',
+          phone: row[2] || '',
+          address: row[3] || '',
+          stateCode: row[4] || '',
+          logo: row[5] || '',
+          invoiceTerms: row[6] || '',
+          gstEnabled: row[7] === 'true' || row[7] === true,
+          defaultGstRate: parseFloat(row[8]) || 18
+        };
+        setBusinessSettings(settings);
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
     }
   };
 
   const generateInvoice = (sale: Sale) => {
     if (!businessSettings) {
-      alert('⚠️ Please configure business settings first!');
+      alert('Please configure business settings first!');
       return;
     }
 
-    const gstCalc = calculateGST(sale.total / 1.18, 'intra'); // Assuming intra-state
+    const gstCalc = calculateGST(sale.total / 1.18, 'intra');
     
     const invoice: Invoice = {
       id: 'INV' + Date.now().toString().slice(-6),
-      date: new Date().toLocaleDateString('en-IN'),
+      date: new Date().toISOString().split('T')[0],
       customer: sale.customer,
       customerPhone: sale.customerPhone || '',
       items: [{
@@ -67,13 +92,13 @@ export default function Invoices() {
       roundOff: 0,
       total: sale.total,
       status: 'Pending',
-      dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN')
+      dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      gstRate: businessSettings.defaultGstRate
     };
 
     setSelectedSale(sale);
     setShowGenerator(true);
     
-    // Show invoice preview
     showInvoicePreview(invoice);
   };
 
@@ -101,6 +126,9 @@ export default function Invoices() {
           .grand-total { font-size: 18px; font-weight: bold; background: #e0f2fe; }
           .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #64748b; }
           .terms { margin-top: 30px; font-size: 12px; color: #64748b; }
+          .btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; margin: 10px; font-weight: 600; }
+          .btn-print { background: #3b82f6; color: white; }
+          .btn-close { background: #64748b; color: white; }
           @media print { button { display: none; } }
         </style>
       </head>
@@ -188,10 +216,10 @@ export default function Invoices() {
 
         <div class="footer">
           <p>Thank you for your business!</p>
-          <button onclick="window.print()" style="background:#3b82f6;color:white;padding:12px 24px;border:none;border-radius:6px;cursor:pointer;margin:10px;">
-            🖨️ Print Invoice
+          <button onclick="window.print()" class="btn btn-print">
+            Print Invoice
           </button>
-          <button onclick="window.close()" style="background:#64748b;color:white;padding:12px 24px;border:none;border-radius:6px;cursor:pointer;margin:10px;">
+          <button onclick="window.close()" class="btn btn-close">
             Close
           </button>
         </div>
@@ -205,12 +233,12 @@ export default function Invoices() {
 
   const sendInvoiceViaWhatsApp = (sale: Sale) => {
     if (!sale.customerPhone) {
-      alert('⚠️ Customer phone number not available!');
+      alert('Customer phone number not available!');
       return;
     }
 
     if (!businessSettings) {
-      alert('⚠️ Please configure business settings first!');
+      alert('Please configure business settings first!');
       return;
     }
 
@@ -218,7 +246,7 @@ export default function Invoices() {
     
     const invoice: Invoice = {
       id: 'INV' + Date.now().toString().slice(-6),
-      date: new Date().toLocaleDateString('en-IN'),
+      date: new Date().toISOString().split('T')[0],
       customer: sale.customer,
       customerPhone: sale.customerPhone,
       items: [{
@@ -235,33 +263,45 @@ export default function Invoices() {
       roundOff: 0,
       total: sale.total,
       status: 'Pending',
-      dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN')
+      dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      gstRate: businessSettings.defaultGstRate
     };
 
-    const waLink = generateInvoiceWhatsAppLink(sale.customerPhone, invoice, businessSettings.name);
+    const whatsapp = WhatsAppHelper.getInstance();
+    const waLink = whatsapp.generateInvoiceWhatsAppLink(invoice, businessSettings.name);
     window.open(waLink, '_blank');
   };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Loading invoices...</div>;
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '40px' }}>
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+        <span style={{ marginLeft: '12px', fontSize: '16px', color: '#64748b' }}>Loading invoices...</span>
+      </div>
+    );
   }
 
   return (
     <div>
-      <h2 style={{ color: '#1e40af', marginBottom: '20px' }}>📄 Invoice Management</h2>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+        <FileText className="w-8 h-8 text-indigo-600" />
+        <h2 style={{ color: '#1e40af', margin: 0 }}>Invoice Management</h2>
+      </div>
       
       {sales.length === 0 ? (
         <div style={{ 
           padding: '40px', 
           textAlign: 'center', 
           background: '#f9fafb', 
-          borderRadius: '12px' 
+          borderRadius: '12px',
+          border: '2px solid #e5e7eb'
         }}>
-          <p style={{ color: '#64748b', fontSize: '18px' }}>No pending sales to invoice.</p>
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" style={{ margin: '0 auto 16px' }} />
+          <p style={{ color: '#64748b', fontSize: '18px', margin: 0 }}>No pending sales to invoice.</p>
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', background: 'white', borderRadius: '8px' }}>
             <thead>
               <tr style={{ background: '#f9fafb' }}>
                 <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Sale ID</th>
@@ -280,80 +320,95 @@ export default function Invoices() {
                   <td style={{ padding: '12px', fontWeight: '600' }}>{sale.customer}</td>
                   <td style={{ padding: '12px' }}>{sale.item}</td>
                   <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(sale.total)}</td>
-                  <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
-  <button
-    onClick={() => generateInvoice(sale)}
-    style={{
-      background: '#3b82f6',
-      color: 'white',
-      padding: '6px 12px',
-      borderRadius: '4px',
-      border: 'none',
-      cursor: 'pointer',
-      fontSize: '12px'
-    }}
-  >
-    📄 Preview
-  </button>
-  <button
-    onClick={() => {
-      if (!businessSettings) {
-        alert('⚠️ Please configure business settings first!');
-        return;
-      }
-      const gstCalc = calculateGST(sale.total / 1.18, 'intra');
-      const invoice: Invoice = {
-        id: 'INV' + Date.now().toString().slice(-6),
-        date: new Date().toLocaleDateString('en-IN'),
-        customer: sale.customer,
-        customerPhone: sale.customerPhone || '',
-        items: [{
-          name: sale.item,
-          sku: '',
-          qty: sale.qty,
-          rate: sale.salePerUnit,
-          amount: sale.total / 1.18
-        }],
-        subtotal: sale.total / 1.18,
-        cgst: gstCalc.cgst,
-        sgst: gstCalc.sgst,
-        igst: gstCalc.igst,
-        roundOff: 0,
-        total: sale.total,
-        status: 'Pending',
-        dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN')
-      };
-      downloadInvoicePDF(invoice, businessSettings);
-    }}
-    style={{
-      background: '#10b981',
-      color: 'white',
-      padding: '6px 12px',
-      borderRadius: '4px',
-      border: 'none',
-      cursor: 'pointer',
-      fontSize: '12px'
-    }}
-  >
-    💾 PDF
-  </button>
-  {sale.customerPhone && (
-    <button
-      onClick={() => sendInvoiceViaWhatsApp(sale)}
-      style={{
-        background: '#25D366',
-        color: 'white',
-        padding: '6px 12px',
-        borderRadius: '4px',
-        border: 'none',
-        cursor: 'pointer',
-        fontSize: '12px'
-      }}
-    >
-      📱 Send
-    </button>
-  )}
-</td>
+                  <td style={{ padding: '12px' }}>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        onClick={() => generateInvoice(sale)}
+                        style={{
+                          background: '#3b82f6',
+                          color: 'white',
+                          padding: '6px 12px',
+                          borderRadius: '4px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Eye className="w-3 h-3" />
+                        Preview
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (!businessSettings) {
+                            alert('Please configure business settings first!');
+                            return;
+                          }
+                          const gstCalc = calculateGST(sale.total / 1.18, 'intra');
+                          const invoice: Invoice = {
+                            id: 'INV' + Date.now().toString().slice(-6),
+                            date: new Date().toISOString().split('T')[0],
+                            customer: sale.customer,
+                            customerPhone: sale.customerPhone || '',
+                            items: [{
+                              name: sale.item,
+                              sku: '',
+                              qty: sale.qty,
+                              rate: sale.salePerUnit,
+                              amount: sale.total / 1.18
+                            }],
+                            subtotal: sale.total / 1.18,
+                            cgst: gstCalc.cgst,
+                            sgst: gstCalc.sgst,
+                            igst: gstCalc.igst,
+                            roundOff: 0,
+                            total: sale.total,
+                            status: 'Pending',
+                            dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                            gstRate: businessSettings.defaultGstRate
+                          };
+                          downloadInvoicePDF(invoice, businessSettings);
+                        }}
+                        style={{
+                          background: '#10b981',
+                          color: 'white',
+                          padding: '6px 12px',
+                          borderRadius: '4px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Download className="w-3 h-3" />
+                        PDF
+                      </button>
+                      {sale.customerPhone && (
+                        <button
+                          onClick={() => sendInvoiceViaWhatsApp(sale)}
+                          style={{
+                            background: '#25D366',
+                            color: 'white',
+                            padding: '6px 12px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <Send className="w-3 h-3" />
+                          Send
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

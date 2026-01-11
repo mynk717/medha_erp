@@ -1,16 +1,23 @@
-// src/app/components/erp/Bills.tsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bill, BusinessSettings } from '@/types/erp';
+import { Bill } from '@/types/erp';
 import { GoogleSheetsService } from '@/lib/googleSheets';
 import { formatCurrency } from '@/lib/calculations';
-import { downloadBillPDF } from '@/lib/pdfGenerator';
+import { generateBillPDF } from '@/lib/pdfGenerator';
+import { 
+  Eye, 
+  Download, 
+  Printer, 
+  CheckCircle, 
+  X,
+  AlertCircle 
+} from 'lucide-react';
 
 export default function Bills() {
   const [bills, setBills] = useState<Bill[]>([]);
-  const [businessSettings, setBusinessSettings] = useState<BusinessSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [previewBill, setPreviewBill] = useState<Bill | null>(null);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     supplier: '',
@@ -21,30 +28,12 @@ export default function Bills() {
 
   useEffect(() => {
     loadBills();
-    loadSettings();
   }, []);
-
-  const loadSettings = () => {
-    const stored = localStorage.getItem('businessSettings');
-    if (stored) {
-      setBusinessSettings(JSON.parse(stored));
-    }
-  };
-
 
   const loadBills = async () => {
     try {
       const sheets = GoogleSheetsService.getInstance();
-      const data = await sheets.getRange('Bills!A2:G');
-      const billsData: Bill[] = data.map(row => ({
-        id: row[0] || '',
-        date: row[1] || '',
-        supplier: row[2] || '',
-        total: parseFloat(row[3]) || 0,
-        dueDate: row[4] || '',
-        status: (row[5] || 'Pending') as any,
-        notes: row[6] || ''
-      }));
+      const billsData = await sheets.loadBills();
       setBills(billsData);
       setLoading(false);
     } catch (error) {
@@ -115,13 +104,32 @@ export default function Bills() {
     }
   };
 
+  const handleDownloadPDF = async (bill: Bill) => {
+    try {
+      await generateBillPDF(bill);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('❌ Failed to generate PDF');
+    }
+  };
+
+  const handlePrint = (bill: Bill) => {
+    setPreviewBill(bill);
+    // Wait for modal to render, then trigger print
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  };
+
   if (loading) {
     return <div style={{ padding: '40px', textAlign: 'center' }}>Loading bills...</div>;
   }
 
   return (
     <div>
-      <h2 style={{ color: '#1e40af', marginBottom: '20px' }}>📋 Bills & Payables</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2 style={{ color: '#1e40af', margin: 0 }}>Bills & Payables</h2>
+      </div>
       
       {/* Bills Table */}
       <div style={{ overflowX: 'auto', marginBottom: '30px' }}>
@@ -160,50 +168,94 @@ export default function Bills() {
                       fontSize: '12px',
                       fontWeight: '600',
                       background: bill.status === 'Paid' ? '#d1fae5' : isOverdue ? '#fee2e2' : '#fef3c7',
-                      color: bill.status === 'Paid' ? '#065f46' : isOverdue ? '#991b1b' : '#92400e'
+                      color: bill.status === 'Paid' ? '#065f46' : isOverdue ? '#991b1b' : '#92400e',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
                     }}>
+                      {bill.status === 'Paid' ? <CheckCircle className="w-3 h-3" /> : isOverdue ? <AlertCircle className="w-3 h-3" /> : null}
                       {isOverdue && bill.status === 'Pending' ? 'Overdue' : bill.status}
                     </span>
                   </td>
                   <td style={{ padding: '12px', fontSize: '12px', color: '#64748b' }}>{bill.notes}</td>
-                  <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
-  {bill.status === 'Pending' && (
-    <button
-      onClick={() => markAsPaid(bill.id, index)}
-      style={{
-        background: '#10b981',
-        color: 'white',
-        padding: '6px 12px',
-        borderRadius: '4px',
-        border: 'none',
-        cursor: 'pointer',
-        fontSize: '12px'
-      }}
-    >
-      ✅ Mark Paid
-    </button>
-  )}
-  <button
-    onClick={() => {
-      if (!businessSettings) {
-        alert('⚠️ Please configure business settings first!');
-        return;
-      }
-      downloadBillPDF(bill, businessSettings);
-    }}
-    style={{
-      background: '#3b82f6',
-      color: 'white',
-      padding: '6px 12px',
-      borderRadius: '4px',
-      border: 'none',
-      cursor: 'pointer',
-      fontSize: '12px'
-    }}
-  >
-    💾 PDF
-  </button>
-</td>
+                  <td style={{ padding: '12px' }}>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      {bill.status === 'Pending' && (
+                        <button
+                          onClick={() => markAsPaid(bill.id, index)}
+                          style={{
+                            background: '#10b981',
+                            color: 'white',
+                            padding: '6px 12px',
+                            borderRadius: '4px',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <CheckCircle className="w-3 h-3" />
+                          Mark Paid
+                        </button>
+                      )}
+                      <button
+                        onClick={() => setPreviewBill(bill)}
+                        style={{
+                          background: '#3b82f6',
+                          color: 'white',
+                          padding: '6px 12px',
+                          borderRadius: '4px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Eye className="w-3 h-3" />
+                        Preview
+                      </button>
+                      <button
+                        onClick={() => handleDownloadPDF(bill)}
+                        style={{
+                          background: '#8b5cf6',
+                          color: 'white',
+                          padding: '6px 12px',
+                          borderRadius: '4px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Download className="w-3 h-3" />
+                        PDF
+                      </button>
+                      <button
+                        onClick={() => handlePrint(bill)}
+                        style={{
+                          background: '#64748b',
+                          color: 'white',
+                          padding: '6px 12px',
+                          borderRadius: '4px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Printer className="w-3 h-3" />
+                        Print
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               );
             })}
@@ -304,6 +356,196 @@ export default function Bills() {
           </button>
         </form>
       </div>
+
+      {/* Preview Modal */}
+      {previewBill && (
+        <div 
+          onClick={() => setPreviewBill(null)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.7)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+            padding: '20px'
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'white',
+              borderRadius: '12px',
+              maxWidth: '800px',
+              width: '100%',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              position: 'relative'
+            }}
+          >
+            {/* Close Button */}
+            <button
+              onClick={() => setPreviewBill(null)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: '#ef4444',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '32px',
+                height: '32px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 10
+              }}
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            {/* Bill Preview Content */}
+            <div style={{ padding: '40px' }} className="print-content">
+              <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                <h1 style={{ color: '#1e40af', margin: '0 0 8px 0' }}>BILL</h1>
+                <p style={{ color: '#64748b', margin: 0 }}>Medha Sanitary & Hardware</p>
+              </div>
+
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 1fr', 
+                gap: '24px',
+                marginBottom: '32px',
+                padding: '20px',
+                background: '#f9fafb',
+                borderRadius: '8px'
+              }}>
+                <div>
+                  <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Bill ID</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.id}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Date</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.date}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Supplier</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.supplier}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Due Date</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.dueDate}</p>
+                </div>
+              </div>
+
+              <div style={{ 
+                padding: '20px',
+                background: '#f9fafb',
+                borderRadius: '8px',
+                marginBottom: '24px'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <p style={{ margin: 0, fontSize: '18px', color: '#64748b' }}>Total Amount</p>
+                  <p style={{ margin: 0, fontSize: '32px', fontWeight: 'bold', color: '#1e40af' }}>
+                    {formatCurrency(previewBill.total)}
+                  </p>
+                </div>
+              </div>
+
+              {previewBill.notes && (
+                <div style={{ padding: '16px', background: '#fef3c7', borderRadius: '8px', borderLeft: '4px solid #f59e0b' }}>
+                  <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#92400e' }}>Notes:</p>
+                  <p style={{ margin: 0, color: '#78350f' }}>{previewBill.notes}</p>
+                </div>
+              )}
+
+              <div style={{ 
+                marginTop: '32px', 
+                paddingTop: '16px', 
+                borderTop: '1px solid #e5e7eb',
+                fontSize: '12px',
+                color: '#64748b',
+                textAlign: 'center'
+              }}>
+                <p style={{ margin: 0 }}>Generated by Medha ERP System</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ 
+              padding: '20px', 
+              borderTop: '1px solid #e5e7eb',
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'flex-end'
+            }} className="no-print">
+              <button
+                onClick={() => handleDownloadPDF(previewBill)}
+                style={{
+                  background: '#8b5cf6',
+                  color: 'white',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Download className="w-4 h-4" />
+                Download PDF
+              </button>
+              <button
+                onClick={() => window.print()}
+                style={{
+                  background: '#3b82f6',
+                  color: 'white',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Printer className="w-4 h-4" />
+                Print
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Print Styles */}
+      <style jsx global>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          .print-content, .print-content * {
+            visibility: visible;
+          }
+          .print-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+          }
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
