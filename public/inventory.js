@@ -1,51 +1,34 @@
-// inventory.js - SIMPLIFIED WORKING VERSION
+// inventory.js - GOOGLE IDENTITY SERVICES (GIS) VERSION
 let spreadsheetId = localStorage.getItem('medhaSheetId') || '';
 let inventoryData = [];
 let gapiReady = false;
+let accessToken = null;
 
-// Wait for page to fully load
+// Initialize Google API Client
 window.addEventListener('load', function() {
-  console.log('Page loaded, initializing...');
+  console.log('Initializing Google APIs...');
   
-  // Wait for gapi to be available
   const waitForGapi = setInterval(() => {
     if (typeof gapi !== 'undefined') {
       clearInterval(waitForGapi);
-      console.log('gapi found, loading client...');
-      initGoogleClient();
+      initGapi();
     }
-  }, 500);
-  
-  // Timeout after 10 seconds
-  setTimeout(() => {
-    if (!gapiReady) {
-      clearInterval(waitForGapi);
-      console.error('Google API failed to load after 10 seconds');
-    }
-  }, 10000);
+  }, 100);
 });
 
-function initGoogleClient() {
-  gapi.load('client:auth2', () => {
-    console.log('gapi client loaded, initializing...');
-    
-    gapi.client.init({
-      apiKey: 'AIzaSyB-your-api-key-here', // ← PUT YOUR REAL API KEY HERE
-      clientId: '273865945262-3a6i04so4dmaifi8ubku85op82ns65cf.apps.googleusercontent.com',
-      discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-      scope: 'https://www.googleapis.com/auth/spreadsheets'
-    }).then(() => {
-      gapiReady = true;
-      console.log('✅ Google Sheets API ready!');
-    }).catch((error) => {
-      console.error('❌ Google API init failed:', error);
+function initGapi() {
+  gapi.load('client', async () => {
+    await gapi.client.init({
+      apiKey: 'YOUR_API_KEY_HERE', // ← PASTE YOUR REAL API KEY
+      discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
     });
+    gapiReady = true;
+    console.log('✅ Google Sheets API ready!');
   });
 }
 
-// Setup everything after DOM loads
+// Setup UI
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM ready, setting up UI...');
   
   // === TAB SWITCHING ===
   document.querySelectorAll('.tab').forEach(tab => {
@@ -57,40 +40,48 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // === CONNECT SHEET ===
-  document.getElementById('connect-sheet').addEventListener('click', async function() {
-    console.log('Connect button clicked, gapiReady:', gapiReady);
-    
+  // === CONNECT SHEET - NEW GIS METHOD ===
+  document.getElementById('connect-sheet').addEventListener('click', function() {
     if (!gapiReady) {
-      alert('⏳ Initializing Google APIs... Please wait a moment and try again.\n\nCheck browser console (F12) for details.');
+      alert('⏳ Google API still initializing... Wait 3 seconds and try again.');
       return;
     }
 
-    try {
-      console.log('Starting Google sign in...');
-      const googleAuth = gapi.auth2.getAuthInstance();
-      const user = await googleAuth.signIn();
-      console.log('User signed in:', user.getBasicProfile().getEmail());
-
-      const sheetId = prompt('📋 Enter Google Sheet ID:\n\nhttps://docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit\n\nPaste the ID part only:');
-      
-      if (sheetId && sheetId.length > 20) {
-        localStorage.setItem('medhaSheetId', sheetId);
-        spreadsheetId = sheetId;
-        document.getElementById('status').textContent = `✅ Connected: ${sheetId.slice(-8)}`;
-        document.getElementById('status').style.display = 'block';
-        await loadRealInventory();
+    // Use NEW Google Identity Services
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: '273865945262-3a6i04so4dmaifi8ubku85op82ns65cf.apps.googleusercontent.com',
+      scope: 'https://www.googleapis.com/auth/spreadsheets',
+      callback: async (response) => {
+        if (response.error) {
+          console.error('Auth error:', response);
+          alert('❌ Login failed: ' + response.error);
+          return;
+        }
+        
+        accessToken = response.access_token;
+        gapi.client.setToken({access_token: accessToken});
+        console.log('✅ Authenticated!');
+        
+        // Now ask for sheet ID
+        const sheetId = prompt('📋 Enter Google Sheet ID:\n\nhttps://docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit\n\nPaste the ID part only:');
+        
+        if (sheetId && sheetId.length > 20) {
+          localStorage.setItem('medhaSheetId', sheetId);
+          spreadsheetId = sheetId;
+          document.getElementById('status').textContent = `✅ Connected: ${sheetId.slice(-8)}`;
+          document.getElementById('status').style.display = 'block';
+          await loadRealInventory();
+        }
       }
-    } catch(e) {
-      console.error('Sign in error:', e);
-      alert('❌ Google login failed:\n' + e.message);
-    }
+    });
+    
+    client.requestAccessToken();
   });
 
   // === LOAD FROM SHEET ===
   async function loadRealInventory() {
     try {
-      console.log('Loading inventory from sheet:', spreadsheetId);
+      console.log('Loading inventory...');
       const response = await gapi.client.sheets.spreadsheets.values.get({
         spreadsheetId: spreadsheetId,
         range: 'Inventory!A1:G'
@@ -101,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log(`✅ Loaded ${inventoryData.length - 1} items`);
     } catch(e) {
       console.error('Load error:', e);
-      alert('❌ Error loading sheet:\n' + e.result.error.message + '\n\nMake sure you have an "Inventory" tab with headers:\nID | Name | SKU | Stock | Cost | Sale | Date');
+      alert('❌ Error loading sheet. Make sure you have an "Inventory" tab with headers:\nID | Name | SKU | Stock | Cost | Sale | Date');
     }
   }
 
@@ -139,12 +130,12 @@ document.addEventListener('DOMContentLoaded', function() {
       alert('✅ SAVED TO YOUR GOOGLE SHEET!');
     } catch(e) {
       console.error('Save error:', e);
-      alert('❌ Save failed:\n' + e.result.error.message);
+      alert('❌ Save failed. Check console.');
     }
   });
 
   // === PURCHASE FORM ===
-  document.getElementById('add-purchase').addEventListener('submit', async function(e) {
+  document.getElementById('add-purchase').addEventListener('submit', function(e) {
     e.preventDefault();
     const inputs = this.querySelectorAll('input');
     const qty = parseInt(inputs[3].value);
@@ -155,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // === SALE FORM ===
-  document.getElementById('add-sale').addEventListener('submit', async function(e) {
+  document.getElementById('add-sale').addEventListener('submit', function(e) {
     e.preventDefault();
     const inputs = this.querySelectorAll('input');
     const qty = parseInt(inputs[3].value);
@@ -197,13 +188,13 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // === GLOBAL FUNCTIONS ===
-  window.editRow = async function(rowIndex) {
+  window.editRow = function(rowIndex) {
     const row = inventoryData[rowIndex];
     const newName = prompt('Edit Name:', row[1]);
     if (newName) {
       row[1] = newName;
       renderInventoryTable();
-      alert('✅ Updated locally! (Sheet update coming soon)');
+      alert('✅ Updated locally!');
     }
   };
 
@@ -212,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
       inventoryData.splice(rowIndex, 1);
       renderInventoryTable();
       populateItemDropdowns();
-      alert('✅ Deleted locally!');
+      alert('✅ Deleted!');
     }
   };
 });
