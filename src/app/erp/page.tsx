@@ -10,6 +10,18 @@ import Invoices from '../components/erp/Invoices';
 import Bills from '../components/erp/Bills';
 import Settings from '../components/erp/Settings';
 import Image from 'next/image';
+import { 
+  LayoutDashboard, 
+  Package, 
+  ShoppingCart, 
+  ShoppingBag, 
+  FileText, 
+  Receipt, 
+  Settings as SettingsIcon,
+  Link,
+  CheckCircle,
+  Loader2
+} from 'lucide-react';
 
 export default function ERPPage() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -23,21 +35,14 @@ export default function ERPPage() {
 
   const initializeApp = async () => {
     try {
-      // Load Google API scripts
       await loadGoogleScripts();
-      
       const sheets = GoogleSheetsService.getInstance();
-      
-      // Check if previously connected
       const savedSheetId = localStorage.getItem('medhaSheetId');
       if (savedSheetId) {
         setSheetId(savedSheetId);
         sheets.setSpreadsheetId(savedSheetId);
       }
-      
-      // Initialize GAPI (no API key needed for OAuth)
       await sheets.initialize();
-      
       setIsInitializing(false);
     } catch (error) {
       console.error('Initialization error:', error);
@@ -59,7 +64,6 @@ export default function ERPPage() {
         if (gapiLoaded && gisLoaded) resolve();
       };
 
-      // Load GAPI
       const gapiScript = document.createElement('script');
       gapiScript.src = 'https://apis.google.com/js/api.js';
       gapiScript.onload = () => {
@@ -68,7 +72,6 @@ export default function ERPPage() {
       };
       document.body.appendChild(gapiScript);
 
-      // Load GIS
       const gisScript = document.createElement('script');
       gisScript.src = 'https://accounts.google.com/gsi/client';
       gisScript.onload = () => {
@@ -82,11 +85,8 @@ export default function ERPPage() {
   const handleConnect = async () => {
     try {
       const sheets = GoogleSheetsService.getInstance();
-      
-      // Step 1: Authenticate (this will get access token via OAuth)
       await sheets.authenticate();
       
-      // Step 2: Ask for spreadsheet ID
       const id = prompt(
         '📋 Enter your Google Sheet ID:\n\n' +
         'Find it in the URL:\n' +
@@ -107,13 +107,13 @@ export default function ERPPage() {
   };
 
   const tabs = [
-    { id: 'dashboard', label: '📊 Dashboard' },
-    { id: 'inventory', label: '📦 Inventory' },
-    { id: 'sales', label: '💵 Sales' },
-    { id: 'purchases', label: '💰 Purchases' },
-    { id: 'invoices', label: '📄 Invoices' },
-    { id: 'bills', label: '📋 Bills' },
-    { id: 'settings', label: '⚙️ Settings' }
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'inventory', label: 'Inventory', icon: Package },
+    { id: 'sales', label: 'Sales', icon: ShoppingCart },
+    { id: 'purchases', label: 'Purchases', icon: ShoppingBag },
+    { id: 'invoices', label: 'Invoices', icon: FileText },
+    { id: 'bills', label: 'Bills', icon: Receipt },
+    { id: 'settings', label: 'Settings', icon: SettingsIcon }
   ];
 
   const renderActiveTab = () => {
@@ -139,7 +139,7 @@ export default function ERPPage() {
         background: '#f8fafc'
       }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-indigo-600" />
           <div style={{ fontSize: '18px', color: '#64748b' }}>Initializing ERP System...</div>
         </div>
       </div>
@@ -178,9 +178,13 @@ export default function ERPPage() {
                 background: 'rgba(255,255,255,0.2)', 
                 padding: '8px 16px', 
                 borderRadius: '20px',
-                fontSize: '14px'
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
               }}>
-                ✅ Connected: ...{sheetId.slice(-8)}
+                <CheckCircle className="w-4 h-4" />
+                Connected: ...{sheetId.slice(-8)}
               </span>
             ) : (
               <button
@@ -192,10 +196,14 @@ export default function ERPPage() {
                   borderRadius: '8px',
                   border: 'none',
                   cursor: 'pointer',
-                  fontWeight: '600'
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
                 }}
               >
-                🔗 Connect Google Sheet
+                <Link className="w-4 h-4" />
+                Connect Google Sheet
               </button>
             )}
           </div>
@@ -218,26 +226,33 @@ export default function ERPPage() {
           padding: '0 40px',
           overflowX: 'auto'
         }}>
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '16px 24px',
-                border: 'none',
-                background: 'transparent',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '15px',
-                color: activeTab === tab.id ? '#667eea' : '#64748b',
-                borderBottom: activeTab === tab.id ? '3px solid #667eea' : '3px solid transparent',
-                transition: 'all 0.2s',
-                whiteSpace: 'nowrap'
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  padding: '16px 24px',
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '15px',
+                  color: activeTab === tab.id ? '#667eea' : '#64748b',
+                  borderBottom: activeTab === tab.id ? '3px solid #667eea' : '3px solid transparent',
+                  transition: 'all 0.2s',
+                  whiteSpace: 'nowrap',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Icon className="w-5 h-5" />
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
       </nav>
 
@@ -317,10 +332,14 @@ export default function ERPPage() {
                 cursor: 'pointer',
                 fontWeight: '600',
                 fontSize: '18px',
-                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
               }}
             >
-              🔗 Connect Google Sheet
+              <Link className="w-5 h-5" />
+              Connect Google Sheet
             </button>
           </div>
         )}
