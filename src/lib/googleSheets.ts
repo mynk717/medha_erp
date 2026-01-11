@@ -16,14 +16,13 @@ export class GoogleSheetsService {
     return this.instance;
   }
 
-  async initialize(apiKey?: string): Promise<void> {  // ← Made apiKey optional parameter
+  async initialize(): Promise<void> {  
     return new Promise((resolve) => {
       const checkGapi = setInterval(() => {
         if (typeof window !== 'undefined' && window.gapi) {
           clearInterval(checkGapi);
           window.gapi.load('client', async () => {
             await window.gapi.client.init({
-              apiKey: apiKey || process.env.NEXT_PUBLIC_GOOGLE_SHEETS_API_KEY || '',
               discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4']
             });
             this.gapiReady = true;

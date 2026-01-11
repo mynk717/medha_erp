@@ -9,11 +9,13 @@ import Purchases from '../components/erp/Purchases';
 import Invoices from '../components/erp/Invoices';
 import Bills from '../components/erp/Bills';
 import Settings from '../components/erp/Settings';
+import Image from 'next/image';
 
 export default function ERPPage() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [isConnected, setIsConnected] = useState(false);
+  const [connected, setConnected] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [sheetId, setSheetId] = useState('');
 
   useEffect(() => {
     initializeApp();
@@ -21,45 +23,58 @@ export default function ERPPage() {
 
   const initializeApp = async () => {
     try {
+      // Load Google API scripts
+      await loadGoogleScripts();
+      
       const sheets = GoogleSheetsService.getInstance();
       
-      // Load Google API script
-      await loadGoogleAPI();
-      
-      // Initialize the service
-      await sheets.initialize();
-      
-      // Check if already connected
-      const savedSheetId = sheets.getSpreadsheetId();
+      // Check if previously connected
+      const savedSheetId = localStorage.getItem('medhaSheetId');
       if (savedSheetId) {
-        // Try to authenticate silently (user was previously connected)
-        setIsConnected(true);
+        setSheetId(savedSheetId);
+        sheets.setSpreadsheetId(savedSheetId);
       }
+      
+      // Initialize GAPI (no API key needed for OAuth)
+      await sheets.initialize();
       
       setIsInitializing(false);
     } catch (error) {
-      console.error('Failed to initialize:', error);
+      console.error('Initialization error:', error);
       setIsInitializing(false);
     }
   };
 
-  const loadGoogleAPI = (): Promise<void> => {
+  const loadGoogleScripts = (): Promise<void> => {
     return new Promise((resolve) => {
-      // Check if already loaded
-      if (typeof window !== 'undefined' && window.gapi) {
+      if (typeof window !== 'undefined' && window.gapi && window.google) {
         resolve();
         return;
       }
 
-      // Load gapi script
+      let gapiLoaded = false;
+      let gisLoaded = false;
+
+      const checkBothLoaded = () => {
+        if (gapiLoaded && gisLoaded) resolve();
+      };
+
+      // Load GAPI
       const gapiScript = document.createElement('script');
       gapiScript.src = 'https://apis.google.com/js/api.js';
-      gapiScript.onload = () => resolve();
+      gapiScript.onload = () => {
+        gapiLoaded = true;
+        checkBothLoaded();
+      };
       document.body.appendChild(gapiScript);
 
-      // Load Google Identity Services
+      // Load GIS
       const gisScript = document.createElement('script');
       gisScript.src = 'https://accounts.google.com/gsi/client';
+      gisScript.onload = () => {
+        gisLoaded = true;
+        checkBothLoaded();
+      };
       document.body.appendChild(gisScript);
     });
   };
@@ -68,25 +83,49 @@ export default function ERPPage() {
     try {
       const sheets = GoogleSheetsService.getInstance();
       
-      // Authenticate user
+      // Step 1: Authenticate (this will get access token via OAuth)
       await sheets.authenticate();
       
-      // Prompt for spreadsheet ID
-      const sheetId = prompt(
+      // Step 2: Ask for spreadsheet ID
+      const id = prompt(
         '📋 Enter your Google Sheet ID:\n\n' +
         'Find it in the URL:\n' +
         'https://docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit\n\n' +
         'Paste the ID part only:'
       );
       
-      if (sheetId && sheetId.length > 20) {
-        sheets.setSpreadsheetId(sheetId);
-        setIsConnected(true);
+      if (id && id.length > 20) {
+        sheets.setSpreadsheetId(id);
+        setSheetId(id);
+        setConnected(true);
         alert('✅ Connected successfully! You can now use the ERP system.');
       }
     } catch (error) {
-      console.error('Connection failed:', error);
-      alert('❌ Connection failed. Please try again.');
+      console.error('Connection error:', error);
+      alert('❌ Connection failed. Please try again and make sure you grant permissions.');
+    }
+  };
+
+  const tabs = [
+    { id: 'dashboard', label: '📊 Dashboard' },
+    { id: 'inventory', label: '📦 Inventory' },
+    { id: 'sales', label: '💵 Sales' },
+    { id: 'purchases', label: '💰 Purchases' },
+    { id: 'invoices', label: '📄 Invoices' },
+    { id: 'bills', label: '📋 Bills' },
+    { id: 'settings', label: '⚙️ Settings' }
+  ];
+
+  const renderActiveTab = () => {
+    switch (activeTab) {
+      case 'dashboard': return <Dashboard onTabSwitch={setActiveTab} />;
+      case 'inventory': return <Inventory />;
+      case 'sales': return <Sales />;
+      case 'purchases': return <Purchases />;
+      case 'invoices': return <Invoices />;
+      case 'bills': return <Bills />;
+      case 'settings': return <Settings />;
+      default: return <Dashboard onTabSwitch={setActiveTab} />;
     }
   };
 
@@ -97,7 +136,7 @@ export default function ERPPage() {
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: '100vh',
-        background: '#f5f5f5'
+        background: '#f8fafc'
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
@@ -107,174 +146,185 @@ export default function ERPPage() {
     );
   }
 
-  if (!isConnected) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        background: '#f5f5f5',
-        padding: '20px'
-      }}>
-        <div style={{
-          background: 'white',
-          padding: '40px',
-          borderRadius: '16px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-          maxWidth: '600px',
-          textAlign: 'center'
-        }}>
-          <h1 style={{ color: '#1e40af', marginBottom: '16px', fontSize: '32px' }}>
-            🏢 Medha ERP System
-          </h1>
-          <p style={{ color: '#64748b', marginBottom: '32px', fontSize: '16px' }}>
-            Connect your Google Sheet to get started
-          </p>
-          
-          <div style={{
-            background: '#e8f4f8',
-            padding: '20px',
-            borderRadius: '8px',
-            marginBottom: '24px',
-            borderLeft: '4px solid #3b82f6',
-            textAlign: 'left'
-          }}>
-            <h3 style={{ color: '#1e40af', margin: '0 0 12px 0' }}>📋 First Time Setup</h3>
-            <ol style={{ margin: 0, color: '#334155', paddingLeft: '20px' }}>
-              <li>
-                <strong>Create a sheet:</strong>{' '}
-                <a 
-                  href="https://docs.google.com/spreadsheets/d/1Q6zMcTWDqk2qpZsjsXqWY3ewnq14kCWwZZgsFQ13CdM/copy" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={{ color: '#3b82f6' }}
-                >
-                  Click here to duplicate template
-                </a>
-              </li>
-              <li style={{ marginTop: '8px' }}>
-                <strong>Get your Sheet ID:</strong> Copy from URL:{' '}
-                <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
-                  docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit
-                </code>
-              </li>
-              <li style={{ marginTop: '8px' }}>
-                <strong>Connect:</strong> Click button below and paste your Sheet ID
-              </li>
-            </ol>
-          </div>
-
-          <button
-            onClick={handleConnect}
-            style={{
-              background: '#3b82f6',
-              color: 'white',
-              padding: '16px 32px',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: '600',
-              fontSize: '18px',
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.background = '#2563eb'}
-            onMouseOut={(e) => e.currentTarget.style.background = '#3b82f6'}
-          >
-            🔗 Connect Google Sheet
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Main ERP Interface (only shown when connected)
   return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f5', padding: '20px' }}>
-      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-        {/* Header */}
-        <div style={{
-          background: 'white',
-          padding: '20px',
-          borderRadius: '12px',
-          marginBottom: '20px',
+    <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
+      {/* Header with Logo */}
+      <header style={{
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        padding: '20px 40px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{ 
+          maxWidth: '1400px', 
+          margin: '0 auto',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+          alignItems: 'center'
         }}>
-          <h1 style={{ color: '#1e40af', margin: 0, fontSize: '24px' }}>
-            🏢 Medha ERP System
-          </h1>
-          <div style={{
-            background: '#10b981',
-            color: 'white',
-            padding: '8px 16px',
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontWeight: '600'
-          }}>
-            ✅ Connected
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <Image 
+              src="/medha-logo.png" 
+              alt="Medha Logo" 
+              width={50} 
+              height={50}
+              style={{ borderRadius: '8px' }}
+            />
+            <h1 style={{ margin: 0, fontSize: '28px' }}>Medha ERP</h1>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {connected ? (
+              <span style={{ 
+                background: 'rgba(255,255,255,0.2)', 
+                padding: '8px 16px', 
+                borderRadius: '20px',
+                fontSize: '14px'
+              }}>
+                ✅ Connected: ...{sheetId.slice(-8)}
+              </span>
+            ) : (
+              <button
+                onClick={handleConnect}
+                style={{
+                  background: 'white',
+                  color: '#667eea',
+                  padding: '10px 20px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: '600'
+                }}
+              >
+                🔗 Connect Google Sheet
+              </button>
+            )}
           </div>
         </div>
+      </header>
 
-        {/* Navigation Tabs */}
-        <div style={{
-          background: 'white',
-          borderRadius: '12px',
-          padding: '8px',
-          marginBottom: '20px',
+      {/* Navigation Tabs */}
+      <nav style={{
+        background: 'white',
+        borderBottom: '1px solid #e5e7eb',
+        position: 'sticky',
+        top: 0,
+        zIndex: 100
+      }}>
+        <div style={{ 
+          maxWidth: '1400px', 
+          margin: '0 auto',
           display: 'flex',
           gap: '8px',
-          flexWrap: 'wrap',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+          padding: '0 40px',
+          overflowX: 'auto'
         }}>
-          {[
-            { id: 'dashboard', label: '📊 Dashboard' },
-            { id: 'inventory', label: '📦 Inventory' },
-            { id: 'purchases', label: '💰 Purchases' },
-            { id: 'sales', label: '💵 Sales' },
-            { id: 'invoices', label: '📋 Invoices' },
-            { id: 'bills', label: '📄 Bills' },
-            { id: 'settings', label: '⚙️ Settings' }
-          ].map(tab => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               style={{
-                flex: '1',
-                minWidth: '120px',
-                padding: '14px 18px',
+                padding: '16px 24px',
                 border: 'none',
-                background: activeTab === tab.id ? '#3b82f6' : 'transparent',
-                color: activeTab === tab.id ? 'white' : '#64748b',
-                borderRadius: '8px',
+                background: 'transparent',
                 cursor: 'pointer',
                 fontWeight: '600',
-                transition: 'all 0.2s'
+                fontSize: '15px',
+                color: activeTab === tab.id ? '#667eea' : '#64748b',
+                borderBottom: activeTab === tab.id ? '3px solid #667eea' : '3px solid transparent',
+                transition: 'all 0.2s',
+                whiteSpace: 'nowrap'
               }}
             >
               {tab.label}
             </button>
           ))}
         </div>
+      </nav>
 
-        {/* Content Area */}
-        <div style={{
-          background: 'white',
-          borderRadius: '12px',
-          padding: '24px',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
-        }}>
-          {activeTab === 'dashboard' && <Dashboard onTabSwitch={setActiveTab} />}
-          {activeTab === 'inventory' && <Inventory />}
-          {activeTab === 'sales' && <Sales />}
-          {activeTab === 'purchases' && <Purchases />}
-          {activeTab === 'invoices' && <Invoices />}
-          {activeTab === 'bills' && <Bills />}
-          {activeTab === 'settings' && <Settings />}
-        </div>
-      </div>
+      {/* Main Content */}
+      <main style={{ 
+        maxWidth: '1400px', 
+        margin: '0 auto',
+        padding: '40px'
+      }}>
+        {connected ? (
+          renderActiveTab()
+        ) : (
+          <div style={{
+            textAlign: 'center',
+            padding: '80px 20px',
+            background: 'white',
+            borderRadius: '16px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.05)'
+          }}>
+            <div style={{ marginBottom: '24px' }}>
+              <Image 
+                src="/medha-logo.png" 
+                alt="Medha Logo" 
+                width={100} 
+                height={100}
+                style={{ borderRadius: '12px' }}
+              />
+            </div>
+            <h2 style={{ color: '#1e40af', marginBottom: '16px' }}>Welcome to Medha ERP</h2>
+            <p style={{ color: '#64748b', marginBottom: '32px', fontSize: '18px' }}>
+              Connect your Google Sheet to get started
+            </p>
+            
+            <div style={{
+              background: '#e8f4f8',
+              padding: '20px',
+              borderRadius: '8px',
+              marginBottom: '24px',
+              borderLeft: '4px solid #3b82f6',
+              textAlign: 'left',
+              maxWidth: '600px',
+              margin: '0 auto 24px'
+            }}>
+              <h3 style={{ color: '#1e40af', margin: '0 0 12px 0' }}>📋 First Time Setup</h3>
+              <ol style={{ margin: 0, color: '#334155', paddingLeft: '20px' }}>
+                <li>
+                  <strong>Create a sheet:</strong>{' '}
+                  <a 
+                    href="https://docs.google.com/spreadsheets/d/1Q6zMcTWDqk2qpZsjsXqWY3ewnq14kCWwZZgsFQ13CdM/copy" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ color: '#3b82f6' }}
+                  >
+                    Click here to duplicate template
+                  </a>
+                </li>
+                <li style={{ marginTop: '8px' }}>
+                  <strong>Get your Sheet ID:</strong> Copy from URL:{' '}
+                  <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+                    docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit
+                  </code>
+                </li>
+                <li style={{ marginTop: '8px' }}>
+                  <strong>Connect:</strong> Click button below and grant permissions
+                </li>
+              </ol>
+            </div>
+            
+            <button
+              onClick={handleConnect}
+              style={{
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: 'white',
+                padding: '16px 40px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '18px',
+                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+              }}
+            >
+              🔗 Connect Google Sheet
+            </button>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
