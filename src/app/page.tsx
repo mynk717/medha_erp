@@ -1,19 +1,30 @@
-import React from "react";
+// src/app/page.tsx
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Auto-redirect to ERP
+    router.push('/erp');
+  }, [router]);
+
   return (
-    <main style={{ margin: 0, padding: 0 }}>
-      <iframe
-        src="/inventory.html"
-        style={{
-          border: "none",
-          display: "block",
-          width: "100vw",
-          height: "100vh",
-          background: "#f5f5f5",
-        }}
-        title="Medha Inventory"
-      />
-    </main>
+    <div style={{ 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      color: 'white'
+    }}>
+      <div style={{ textAlign: 'center' }}>
+        <h1 style={{ fontSize: '48px', marginBottom: '16px' }}>Medha ERP</h1>
+        <p style={{ fontSize: '18px', opacity: 0.9 }}>Loading...</p>
+      </div>
+    </div>
   );
 }

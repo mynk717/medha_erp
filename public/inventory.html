@@ -34,6 +34,8 @@
       <button class="tab" data-tab="sales">💵 Sales</button>
       <button class="tab" data-tab="invoices">📋 Invoices</button>
       <button class="tab" data-tab="bills">📄 Bills</button>
+      <button class="tab" data-tab="settings">⚙️ Settings</button>
+      <button class="tab" data-tab="dashboard">📊 Dashboard</button>
     </nav>
 
     <!-- Inventory tab -->
@@ -124,6 +126,110 @@
         <tbody></tbody>
       </table>
     </div>
+    <!-- Settings tab -->
+<div id="settings-tab" class="tab-content">
+  <h2 style="color: #1e40af; margin-bottom: 20px;">⚙️ Business Settings</h2>
+  
+  <form id="save-settings" class="form-grid" style="grid-template-columns: 1fr 1fr; max-width: 800px;">
+    <div style="grid-column: 1 / -1;">
+      <label style="display: block; font-weight: 600; margin-bottom: 8px;">Business Name *</label>
+      <input id="business-name" type="text" placeholder="Medha Sanitary & Hardware" required />
+    </div>
+    
+    <div>
+      <label style="display: block; font-weight: 600; margin-bottom: 8px;">GST Number</label>
+      <input id="gst-number" type="text" placeholder="22AAAAA0000A1Z5" />
+    </div>
+    
+    <div>
+      <label style="display: block; font-weight: 600; margin-bottom: 8px;">Phone</label>
+      <input id="business-phone" type="tel" placeholder="+91 9876543210" />
+    </div>
+    
+    <div style="grid-column: 1 / -1;">
+      <label style="display: block; font-weight: 600; margin-bottom: 8px;">Address *</label>
+      <textarea id="business-address" placeholder="Shop No. 5, Main Road, Raipur, Chhattisgarh - 492001" rows="3" style="resize: vertical; width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-family: inherit;"></textarea>
+    </div>
+    
+    <div>
+      <label style="display: block; font-weight: 600; margin-bottom: 8px;">State Code (for GST)</label>
+      <input id="state-code" type="text" placeholder="22" maxlength="2" />
+      <small style="color: #64748b;">e.g., 22 for Chhattisgarh</small>
+    </div>
+    
+    <div>
+      <label style="display: block; font-weight: 600; margin-bottom: 8px;">Logo URL (optional)</label>
+      <input id="business-logo" type="url" placeholder="https://example.com/logo.png" />
+    </div>
+    
+    <div style="grid-column: 1 / -1;">
+      <label style="display: block; font-weight: 600; margin-bottom: 8px;">Invoice Terms & Conditions</label>
+      <textarea id="invoice-terms" placeholder="1. Payment due within 15 days&#10;2. Goods once sold will not be taken back&#10;3. Subject to Raipur jurisdiction" rows="4" style="resize: vertical; width: 100%; padding: 14px; border: 2px solid #e2e8f0; border-radius: 8px; font-family: inherit;"></textarea>
+    </div>
+    
+    <button type="submit" style="grid-column: 1 / -1;">💾 Save Settings</button>
+  </form>
+  
+  <div id="settings-status" style="margin-top: 20px; padding: 12px; background: #10b981; color: white; border-radius: 8px; display: none;"></div>
+</div>
+
+<!-- Add this dashboard content -->
+<div id="dashboard-tab" class="tab-content">
+  <h2 style="color: #1e40af; margin-bottom: 20px;">📊 Business Dashboard</h2>
+  
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+    <!-- Today's Sales Card -->
+    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Today's Sales</div>
+      <div id="today-sales" style="font-size: 32px; font-weight: bold;">₹0</div>
+      <div id="today-count" style="font-size: 12px; opacity: 0.8; margin-top: 4px;">0 orders</div>
+    </div>
+    
+    <!-- This Month Card -->
+    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">This Month</div>
+      <div id="month-sales" style="font-size: 32px; font-weight: bold;">₹0</div>
+      <div id="month-count" style="font-size: 12px; opacity: 0.8; margin-top: 4px;">0 orders</div>
+    </div>
+    
+    <!-- Pending Payments Card -->
+    <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Pending Payments</div>
+      <div id="pending-amount" style="font-size: 32px; font-weight: bold;">₹0</div>
+      <div id="pending-count" style="font-size: 12px; opacity: 0.8; margin-top: 4px;">0 invoices</div>
+    </div>
+    
+    <!-- Low Stock Alert Card -->
+    <div style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Low Stock Alerts</div>
+      <div id="low-stock-count" style="font-size: 32px; font-weight: bold;">0</div>
+      <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">Items below 5 units</div>
+    </div>
+  </div>
+  
+  <!-- Quick Actions -->
+  <h3 style="color: #1e40af; margin-bottom: 16px;">⚡ Quick Actions</h3>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    <button onclick="switchTab('sales')" style="background: #10b981; color: white; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">+ New Sale</button>
+    <button onclick="switchTab('purchases')" style="background: #f59e0b; color: white; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">+ New Purchase</button>
+    <button onclick="switchTab('inventory')" style="background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">+ Add Item</button>
+    <button onclick="viewPendingPayments()" style="background: #ef4444; color: white; padding: 12px 24px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">💰 View Pending</button>
+  </div>
+  
+  <!-- Low Stock Items Table -->
+  <div id="low-stock-section" style="margin-top: 30px; display: none;">
+    <h3 style="color: #ef4444; margin-bottom: 16px;">⚠️ Low Stock Items</h3>
+    <table id="low-stock-table" style="width: 100%;">
+      <thead>
+        <tr>
+          <th>Name</th><th>SKU</th><th>Current Stock</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
   </div>
 
   <!-- Load inventory.js LAST -->
