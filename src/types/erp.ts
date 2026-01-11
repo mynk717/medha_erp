@@ -58,7 +58,7 @@ export interface BusinessSettings {
     supplier: string;
     total: number;
     dueDate: string;
-    status: 'Pending' | 'Paid' | 'Partial';
+    status: 'Pending' | 'Paid' | 'Partial' |'Overdue';
     notes?: string;
   }
   

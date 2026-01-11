@@ -1,5 +1,5 @@
 // src/lib/googleSheets.ts - FIXED to accept apiKey parameter
-import { InventoryItem, Purchase, Sale } from '@/types/erp';
+import { InventoryItem, Purchase, Sale, Bill } from '@/types/erp';
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '273865945262-3a6i04so4dmaifi8ubku85op82ns65cf.apps.googleusercontent.com';
 
@@ -157,6 +157,18 @@ export class GoogleSheetsService {
       status: (row[7] || 'Pending') as any
     }));
   }
+  async loadBills(): Promise<Bill[]> {
+    const data = await this.getRange('Bills!A2:G');
+    return data.map(row => ({
+      id: row[0] || '',
+      date: row[1] || '',
+      supplier: row[2] || '',
+      total: parseFloat(row[3]) || 0,
+      dueDate: row[4] || '',
+      status: (row[5] || 'Pending') as any,
+      notes: row[6] || ''
+    }));
+  }  
 }
 
 declare global {

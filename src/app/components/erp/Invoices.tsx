@@ -6,6 +6,7 @@ import { Invoice, Sale, BusinessSettings } from '@/types/erp';
 import { GoogleSheetsService } from '@/lib/googleSheets';
 import { formatCurrency, calculateGST } from '@/lib/calculations';
 import { generateInvoiceWhatsAppLink } from '@/lib/whatsappHelper';
+import { downloadInvoicePDF } from '@/lib/pdfGenerator';
 
 export default function Invoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -279,39 +280,80 @@ export default function Invoices() {
                   <td style={{ padding: '12px', fontWeight: '600' }}>{sale.customer}</td>
                   <td style={{ padding: '12px' }}>{sale.item}</td>
                   <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(sale.total)}</td>
-                  <td style={{ padding: '12px' }}>
-                    <button
-                      onClick={() => generateInvoice(sale)}
-                      style={{
-                        background: '#3b82f6',
-                        color: 'white',
-                        padding: '6px 12px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        marginRight: '8px'
-                      }}
-                    >
-                      📄 Generate
-                    </button>
-                    {sale.customerPhone && (
-                      <button
-                        onClick={() => sendInvoiceViaWhatsApp(sale)}
-                        style={{
-                          background: '#25D366',
-                          color: 'white',
-                          padding: '6px 12px',
-                          borderRadius: '4px',
-                          border: 'none',
-                          cursor: 'pointer',
-                          fontSize: '12px'
-                        }}
-                      >
-                        📱 Send
-                      </button>
-                    )}
-                  </td>
+                  <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
+  <button
+    onClick={() => generateInvoice(sale)}
+    style={{
+      background: '#3b82f6',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '4px',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '12px'
+    }}
+  >
+    📄 Preview
+  </button>
+  <button
+    onClick={() => {
+      if (!businessSettings) {
+        alert('⚠️ Please configure business settings first!');
+        return;
+      }
+      const gstCalc = calculateGST(sale.total / 1.18, 'intra');
+      const invoice: Invoice = {
+        id: 'INV' + Date.now().toString().slice(-6),
+        date: new Date().toLocaleDateString('en-IN'),
+        customer: sale.customer,
+        customerPhone: sale.customerPhone || '',
+        items: [{
+          name: sale.item,
+          sku: '',
+          qty: sale.qty,
+          rate: sale.salePerUnit,
+          amount: sale.total / 1.18
+        }],
+        subtotal: sale.total / 1.18,
+        cgst: gstCalc.cgst,
+        sgst: gstCalc.sgst,
+        igst: gstCalc.igst,
+        roundOff: 0,
+        total: sale.total,
+        status: 'Pending',
+        dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toLocaleDateString('en-IN')
+      };
+      downloadInvoicePDF(invoice, businessSettings);
+    }}
+    style={{
+      background: '#10b981',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '4px',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '12px'
+    }}
+  >
+    💾 PDF
+  </button>
+  {sale.customerPhone && (
+    <button
+      onClick={() => sendInvoiceViaWhatsApp(sale)}
+      style={{
+        background: '#25D366',
+        color: 'white',
+        padding: '6px 12px',
+        borderRadius: '4px',
+        border: 'none',
+        cursor: 'pointer',
+        fontSize: '12px'
+      }}
+    >
+      📱 Send
+    </button>
+  )}
+</td>
                 </tr>
               ))}
             </tbody>

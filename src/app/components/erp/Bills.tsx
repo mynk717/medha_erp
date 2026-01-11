@@ -2,12 +2,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bill } from '@/types/erp';
+import { Bill, BusinessSettings } from '@/types/erp';
 import { GoogleSheetsService } from '@/lib/googleSheets';
 import { formatCurrency } from '@/lib/calculations';
+import { downloadBillPDF } from '@/lib/pdfGenerator';
 
 export default function Bills() {
   const [bills, setBills] = useState<Bill[]>([]);
+  const [businessSettings, setBusinessSettings] = useState<BusinessSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -19,7 +21,16 @@ export default function Bills() {
 
   useEffect(() => {
     loadBills();
+    loadSettings();
   }, []);
+
+  const loadSettings = () => {
+    const stored = localStorage.getItem('businessSettings');
+    if (stored) {
+      setBusinessSettings(JSON.parse(stored));
+    }
+  };
+
 
   const loadBills = async () => {
     try {
@@ -155,24 +166,44 @@ export default function Bills() {
                     </span>
                   </td>
                   <td style={{ padding: '12px', fontSize: '12px', color: '#64748b' }}>{bill.notes}</td>
-                  <td style={{ padding: '12px' }}>
-                    {bill.status === 'Pending' && (
-                      <button
-                        onClick={() => markAsPaid(bill.id, index)}
-                        style={{
-                          background: '#10b981',
-                          color: 'white',
-                          padding: '6px 12px',
-                          borderRadius: '4px',
-                          border: 'none',
-                          cursor: 'pointer',
-                          fontSize: '12px'
-                        }}
-                      >
-                        ✅ Mark Paid
-                      </button>
-                    )}
-                  </td>
+                  <td style={{ padding: '12px', display: 'flex', gap: '8px' }}>
+  {bill.status === 'Pending' && (
+    <button
+      onClick={() => markAsPaid(bill.id, index)}
+      style={{
+        background: '#10b981',
+        color: 'white',
+        padding: '6px 12px',
+        borderRadius: '4px',
+        border: 'none',
+        cursor: 'pointer',
+        fontSize: '12px'
+      }}
+    >
+      ✅ Mark Paid
+    </button>
+  )}
+  <button
+    onClick={() => {
+      if (!businessSettings) {
+        alert('⚠️ Please configure business settings first!');
+        return;
+      }
+      downloadBillPDF(bill, businessSettings);
+    }}
+    style={{
+      background: '#3b82f6',
+      color: 'white',
+      padding: '6px 12px',
+      borderRadius: '4px',
+      border: 'none',
+      cursor: 'pointer',
+      fontSize: '12px'
+    }}
+  >
+    💾 PDF
+  </button>
+</td>
                 </tr>
               );
             })}
