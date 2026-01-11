@@ -1,6 +1,8 @@
-// inventory.js - GOOGLE IDENTITY SERVICES (GIS) VERSION
+// inventory.js - ALL TABS WORKING VERSION
 let spreadsheetId = localStorage.getItem('medhaSheetId') || '';
 let inventoryData = [];
+let purchasesData = [];
+let salesData = [];
 let gapiReady = false;
 let accessToken = null;
 
@@ -36,18 +38,26 @@ document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       this.classList.add('active');
-      document.getElementById(this.dataset.tab + '-tab').classList.add('active');
+      const tabId = this.dataset.tab + '-tab';
+      document.getElementById(tabId).classList.add('active');
+      
+      // Load data when switching tabs
+      if (this.dataset.tab === 'purchases' && purchasesData.length === 0) {
+        loadPurchases();
+      } else if (this.dataset.tab === 'sales' && salesData.length === 0) {
+        loadSales();
+      }
     });
   });
 
-  // === CONNECT SHEET - NEW GIS METHOD ===
+  // === CONNECT SHEET ===
   document.getElementById('connect-sheet').addEventListener('click', function() {
     if (!gapiReady) {
       alert('⏳ Google API still initializing... Wait 3 seconds and try again.');
       return;
     }
 
-    // Use NEW Google Identity Services
+    // Use Google Identity Services
     const client = google.accounts.oauth2.initTokenClient({
       client_id: '273865945262-3a6i04so4dmaifi8ubku85op82ns65cf.apps.googleusercontent.com',
       scope: 'https://www.googleapis.com/auth/spreadsheets',
@@ -62,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
         gapi.client.setToken({access_token: accessToken});
         console.log('✅ Authenticated!');
         
-        // Now ask for sheet ID
         const sheetId = prompt('📋 Enter Google Sheet ID:\n\nhttps://docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit\n\nPaste the ID part only:');
         
         if (sheetId && sheetId.length > 20) {
@@ -78,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
     client.requestAccessToken();
   });
 
-  // === LOAD FROM SHEET ===
+  // === LOAD INVENTORY ===
   async function loadRealInventory() {
     try {
       console.log('Loading inventory...');
@@ -92,7 +101,39 @@ document.addEventListener('DOMContentLoaded', function() {
       console.log(`✅ Loaded ${inventoryData.length - 1} items`);
     } catch(e) {
       console.error('Load error:', e);
-      alert('❌ Error loading sheet. Make sure you have an "Inventory" tab with headers:\nID | Name | SKU | Stock | Cost | Sale | Date');
+      alert('❌ Error loading Inventory sheet. Make sure you have an "Inventory" tab with headers:\nID | Name | SKU | Stock | Cost | Sale | Date');
+    }
+  }
+
+  // === LOAD PURCHASES ===
+  async function loadPurchases() {
+    if (!spreadsheetId) return;
+    try {
+      const response = await gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: spreadsheetId,
+        range: 'Purchases!A1:H'
+      });
+      purchasesData = response.result.values || [];
+      renderPurchasesTable();
+      console.log(`✅ Loaded ${purchasesData.length - 1} purchases`);
+    } catch(e) {
+      console.log('Purchases sheet not found or empty');
+    }
+  }
+
+  // === LOAD SALES ===
+  async function loadSales() {
+    if (!spreadsheetId) return;
+    try {
+      const response = await gapi.client.sheets.spreadsheets.values.get({
+        spreadsheetId: spreadsheetId,
+        range: 'Sales!A1:H'
+      });
+      salesData = response.result.values || [];
+      renderSalesTable();
+      console.log(`✅ Loaded ${salesData.length - 1} sales`);
+    } catch(e) {
+      console.log('Sales sheet not found or empty');
     }
   }
 
@@ -127,36 +168,106 @@ document.addEventListener('DOMContentLoaded', function() {
       renderInventoryTable();
       populateItemDropdowns();
       this.reset();
-      alert('✅ SAVED TO YOUR GOOGLE SHEET!');
+      alert('✅ Item saved to Inventory sheet!');
     } catch(e) {
       console.error('Save error:', e);
       alert('❌ Save failed. Check console.');
     }
   });
 
-  // === PURCHASE FORM ===
-  document.getElementById('add-purchase').addEventListener('submit', function(e) {
+  // === ADD PURCHASE - NOW WORKING ===
+  document.getElementById('add-purchase').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const inputs = this.querySelectorAll('input');
+    
+    if (!spreadsheetId) {
+      alert('⚠️ Connect Google Sheet first!');
+      return;
+    }
+
+    const inputs = this.querySelectorAll('input, select');
+    const dateValue = inputs[0].value;
+    const supplier = inputs[1].value;
+    const item = inputs[2].value;
     const qty = parseInt(inputs[3].value);
     const cost = parseFloat(inputs[4].value);
     const total = qty * cost;
-    alert(`✅ Purchase added!\n₹${total.toFixed(2)} | Stock +${qty}`);
-    this.reset();
+
+    const purchase = [
+      'P' + Date.now().toString().slice(-6),
+      dateValue,
+      supplier,
+      item,
+      qty,
+      cost.toFixed(2),
+      total.toFixed(2),
+      'Pending'
+    ];
+
+    try {
+      await gapi.client.sheets.spreadsheets.values.append({
+        spreadsheetId: spreadsheetId,
+        range: 'Purchases!A:H',
+        valueInputOption: 'USER_ENTERED',
+        resource: { values: [purchase] }
+      });
+
+      purchasesData.push(purchase);
+      renderPurchasesTable();
+      this.reset();
+      alert(`✅ Purchase saved!\n₹${total.toFixed(2)} | Qty: ${qty}\n\nSaved to Purchases sheet.`);
+    } catch(e) {
+      console.error('Purchase save error:', e);
+      alert('❌ Failed to save purchase. Make sure you have a "Purchases" tab with headers:\nID | Date | Supplier | Item | Qty | Cost/Unit | Total | Status');
+    }
   });
 
-  // === SALE FORM ===
-  document.getElementById('add-sale').addEventListener('submit', function(e) {
+  // === ADD SALE - NOW WORKING ===
+  document.getElementById('add-sale').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const inputs = this.querySelectorAll('input');
+    
+    if (!spreadsheetId) {
+      alert('⚠️ Connect Google Sheet first!');
+      return;
+    }
+
+    const inputs = this.querySelectorAll('input, select');
+    const dateValue = inputs[0].value;
+    const customer = inputs[1].value;
+    const item = inputs[2].value;
     const qty = parseInt(inputs[3].value);
     const price = parseFloat(inputs[4].value);
     const total = qty * price;
-    alert(`✅ Sale recorded!\n₹${total.toFixed(2)} | Stock -${qty}`);
-    this.reset();
+
+    const sale = [
+      'S' + Date.now().toString().slice(-6),
+      dateValue,
+      customer,
+      item,
+      qty,
+      price.toFixed(2),
+      total.toFixed(2),
+      'Pending'
+    ];
+
+    try {
+      await gapi.client.sheets.spreadsheets.values.append({
+        spreadsheetId: spreadsheetId,
+        range: 'Sales!A:H',
+        valueInputOption: 'USER_ENTERED',
+        resource: { values: [sale] }
+      });
+
+      salesData.push(sale);
+      renderSalesTable();
+      this.reset();
+      alert(`✅ Sale saved!\n₹${total.toFixed(2)} | Qty: ${qty}\n\nSaved to Sales sheet.`);
+    } catch(e) {
+      console.error('Sale save error:', e);
+      alert('❌ Failed to save sale. Make sure you have a "Sales" tab with headers:\nID | Date | Customer | Item | Qty | Sale/Unit | Total | Status');
+    }
   });
 
-  // === RENDER TABLE ===
+  // === RENDER INVENTORY TABLE ===
   function renderInventoryTable() {
     const tbody = document.querySelector('#inventory-table tbody');
     tbody.innerHTML = '';
@@ -176,8 +287,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // === RENDER PURCHASES TABLE ===
+  function renderPurchasesTable() {
+    const tbody = document.querySelector('#purchases-table tbody');
+    tbody.innerHTML = '';
+    if (purchasesData.length > 1) {
+      purchasesData.slice(1).forEach((row) => {
+        const tr = tbody.insertRow();
+        row.forEach(cell => {
+          const td = tr.insertCell();
+          td.textContent = cell;
+        });
+      });
+    }
+  }
+
+  // === RENDER SALES TABLE ===
+  function renderSalesTable() {
+    const tbody = document.querySelector('#sales-table tbody');
+    tbody.innerHTML = '';
+    if (salesData.length > 1) {
+      salesData.slice(1).forEach((row) => {
+        const tr = tbody.insertRow();
+        row.forEach(cell => {
+          const td = tr.insertCell();
+          td.textContent = cell;
+        });
+      });
+    }
+  }
+
   // === DROPDOWNS ===
   function populateItemDropdowns() {
+    if (inventoryData.length <= 1) return;
+    
     const items = inventoryData.slice(1).map(row => `${row[1]} (${row[2]})`);
     document.querySelectorAll('select').forEach(select => {
       if (select.id.includes('items')) {
@@ -194,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (newName) {
       row[1] = newName;
       renderInventoryTable();
-      alert('✅ Updated locally!');
+      alert('✅ Updated locally! (Full sheet sync coming soon)');
     }
   };
 
@@ -203,7 +346,13 @@ document.addEventListener('DOMContentLoaded', function() {
       inventoryData.splice(rowIndex, 1);
       renderInventoryTable();
       populateItemDropdowns();
-      alert('✅ Deleted!');
+      alert('✅ Deleted locally!');
     }
   };
+
+  // Auto-load if already connected
+  if (spreadsheetId) {
+    document.getElementById('status').textContent = `✅ Previously connected: ${spreadsheetId.slice(-8)}`;
+    document.getElementById('status').style.display = 'block';
+  }
 });
