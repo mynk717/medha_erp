@@ -14,7 +14,6 @@ import Settings from '../components/erp/Settings';
 import Image from 'next/image';
 import Reminders from '../components/erp/Reminders';
 import SheetSwitcher from '../components/SheetSwitcher';
-import { KVStore } from '@/lib/kvStore';
 import { 
   LayoutDashboard, 
   Package, 
@@ -81,18 +80,20 @@ const loadUserSheets = async () => {
   if (!session?.user) return;
   
   try {
-    const kv = KVStore.getInstance();
-    const userId = (session.user as any).userId;
-    const sheets = await kv.getUserSheets(userId);
-    const activeId = await kv.getActiveSheet(userId);
+    const response = await fetch('/api/sheets');
     
-    setUserSheets(sheets);
-    setActiveSheetId(activeId);
+    if (!response.ok) {
+      throw new Error('Failed to fetch sheets');
+    }
     
-    if (activeId) {
-      setSheetId(activeId);
+    const data = await response.json();
+    setUserSheets(data.sheets || []);
+    setActiveSheetId(data.activeSheetId);
+    
+    if (data.activeSheetId) {
+      setSheetId(data.activeSheetId);
       const gsService = GoogleSheetsService.getInstance();
-      gsService.setSpreadsheetId(activeId);
+      gsService.setSpreadsheetId(data.activeSheetId);
       setConnected(true);
     }
   } catch (error) {
@@ -105,10 +106,19 @@ const handleSwitchSheet = async (spreadsheetId: string) => {
   if (!session?.user) return;
   
   try {
-    const kv = KVStore.getInstance();
-    const userId = (session.user as any).userId;
+    const response = await fetch('/api/sheets', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        spreadsheetId, 
+        setActive: true 
+      })
+    });
     
-    await kv.setActiveSheet(userId, spreadsheetId);
+    if (!response.ok) {
+      throw new Error('Failed to switch sheet');
+    }
+    
     setActiveSheetId(spreadsheetId);
     setSheetId(spreadsheetId);
     
@@ -116,7 +126,6 @@ const handleSwitchSheet = async (spreadsheetId: string) => {
     sheets.setSpreadsheetId(spreadsheetId);
     setConnected(true);
     
-    // Reload sheets list to update lastUsed
     await loadUserSheets();
     
     alert(`✅ Switched to sheet!`);
@@ -131,11 +140,15 @@ const handleAddSheet = async (spreadsheetId: string, tag: string) => {
   if (!session?.user) return;
   
   try {
-    const kv = KVStore.getInstance();
-    const userId = (session.user as any).userId;
+    const response = await fetch('/api/sheets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ spreadsheetId, tag })
+    });
     
-    await kv.addUserSheet(userId, spreadsheetId, tag);
-    await kv.setActiveSheet(userId, spreadsheetId);
+    if (!response.ok) {
+      throw new Error('Failed to add sheet');
+    }
     
     setSheetId(spreadsheetId);
     setActiveSheetId(spreadsheetId);
@@ -153,15 +166,19 @@ const handleAddSheet = async (spreadsheetId: string, tag: string) => {
   }
 };
 
-// Remove sheet
+// Replace handleRemoveSheet function
 const handleRemoveSheet = async (spreadsheetId: string) => {
   if (!session?.user) return;
   
   try {
-    const kv = KVStore.getInstance();
-    const userId = (session.user as any).userId;
+    const response = await fetch(`/api/sheets?id=${spreadsheetId}`, {
+      method: 'DELETE'
+    });
     
-    await kv.removeUserSheet(userId, spreadsheetId);
+    if (!response.ok) {
+      throw new Error('Failed to remove sheet');
+    }
+    
     await loadUserSheets();
     
     if (spreadsheetId === activeSheetId) {
@@ -177,15 +194,24 @@ const handleRemoveSheet = async (spreadsheetId: string) => {
   }
 };
 
-// Update sheet tag
+// Replace handleUpdateSheetTag function
 const handleUpdateSheetTag = async (spreadsheetId: string, newTag: string) => {
   if (!session?.user) return;
   
   try {
-    const kv = KVStore.getInstance();
-    const userId = (session.user as any).userId;
+    const response = await fetch('/api/sheets', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        spreadsheetId, 
+        tag: newTag 
+      })
+    });
     
-    await kv.addUserSheet(userId, spreadsheetId, newTag);
+    if (!response.ok) {
+      throw new Error('Failed to update tag');
+    }
+    
     await loadUserSheets();
     
     alert(`✅ Tag updated to "${newTag}"`);
