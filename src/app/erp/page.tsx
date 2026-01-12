@@ -13,6 +13,8 @@ import Bills from '../components/erp/Bills';
 import Settings from '../components/erp/Settings';
 import Image from 'next/image';
 import Reminders from '../components/erp/Reminders';
+import SheetSwitcher from '../components/SheetSwitcher';
+import { KVStore } from '@/lib/kvStore';
 import { 
   LayoutDashboard, 
   Package, 
@@ -38,6 +40,8 @@ export default function ERPPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [userSheets, setUserSheets] = useState<Array<{id: string, tag: string, addedAt: number, lastUsed: number}>>([]);
+const [activeSheetId, setActiveSheetId] = useState<string | null>(null);
 
   // ========== FUNCTIONS FIRST (BEFORE useEffect) ==========
 
@@ -72,6 +76,124 @@ export default function ERPPage() {
       document.body.appendChild(gisScript);
     });
   };
+// Load user's sheets from Redis
+const loadUserSheets = async () => {
+  if (!session?.user) return;
+  
+  try {
+    const kv = KVStore.getInstance();
+    const userId = (session.user as any).userId;
+    const sheets = await kv.getUserSheets(userId);
+    const activeId = await kv.getActiveSheet(userId);
+    
+    setUserSheets(sheets);
+    setActiveSheetId(activeId);
+    
+    if (activeId) {
+      setSheetId(activeId);
+      const gsService = GoogleSheetsService.getInstance();
+      gsService.setSpreadsheetId(activeId);
+      setConnected(true);
+    }
+  } catch (error) {
+    console.error('Error loading user sheets:', error);
+  }
+};
+
+// Switch to different sheet
+const handleSwitchSheet = async (spreadsheetId: string) => {
+  if (!session?.user) return;
+  
+  try {
+    const kv = KVStore.getInstance();
+    const userId = (session.user as any).userId;
+    
+    await kv.setActiveSheet(userId, spreadsheetId);
+    setActiveSheetId(spreadsheetId);
+    setSheetId(spreadsheetId);
+    
+    const sheets = GoogleSheetsService.getInstance();
+    sheets.setSpreadsheetId(spreadsheetId);
+    setConnected(true);
+    
+    // Reload sheets list to update lastUsed
+    await loadUserSheets();
+    
+    alert(`✅ Switched to sheet!`);
+  } catch (error) {
+    console.error('Error switching sheet:', error);
+    alert('❌ Failed to switch sheet');
+  }
+};
+
+// Add new sheet
+const handleAddSheet = async (spreadsheetId: string, tag: string) => {
+  if (!session?.user) return;
+  
+  try {
+    const kv = KVStore.getInstance();
+    const userId = (session.user as any).userId;
+    
+    await kv.addUserSheet(userId, spreadsheetId, tag);
+    await kv.setActiveSheet(userId, spreadsheetId);
+    
+    setSheetId(spreadsheetId);
+    setActiveSheetId(spreadsheetId);
+    
+    const sheets = GoogleSheetsService.getInstance();
+    sheets.setSpreadsheetId(spreadsheetId);
+    setConnected(true);
+    
+    await loadUserSheets();
+    
+    alert(`✅ Sheet "${tag}" connected successfully!`);
+  } catch (error) {
+    console.error('Error adding sheet:', error);
+    alert('❌ Failed to add sheet');
+  }
+};
+
+// Remove sheet
+const handleRemoveSheet = async (spreadsheetId: string) => {
+  if (!session?.user) return;
+  
+  try {
+    const kv = KVStore.getInstance();
+    const userId = (session.user as any).userId;
+    
+    await kv.removeUserSheet(userId, spreadsheetId);
+    await loadUserSheets();
+    
+    if (spreadsheetId === activeSheetId) {
+      setConnected(false);
+      setSheetId('');
+      setActiveSheetId(null);
+    }
+    
+    alert('✅ Sheet removed');
+  } catch (error) {
+    console.error('Error removing sheet:', error);
+    alert('❌ Failed to remove sheet');
+  }
+};
+
+// Update sheet tag
+const handleUpdateSheetTag = async (spreadsheetId: string, newTag: string) => {
+  if (!session?.user) return;
+  
+  try {
+    const kv = KVStore.getInstance();
+    const userId = (session.user as any).userId;
+    
+    await kv.addUserSheet(userId, spreadsheetId, newTag);
+    await loadUserSheets();
+    
+    alert(`✅ Tag updated to "${newTag}"`);
+  } catch (error) {
+    console.error('Error updating tag:', error);
+    alert('❌ Failed to update tag');
+  }
+};
 
   const initializeApp = async () => {
     try {
@@ -137,10 +259,10 @@ export default function ERPPage() {
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
-    } else if (status === 'authenticated') {
-      setLoading(false);
+    } else  if (status === 'authenticated' && session?.user) {
+      loadUserSheets();
     }
-  }, [status, router]);
+  }, [status, session]);
 
   // ========== RENDER ==========
 
@@ -485,6 +607,17 @@ export default function ERPPage() {
         margin: '0 auto',
         padding: '40px'
       }}>
+        {/* Sheet Switcher - Only show if authenticated */}
+  {session?.user && (
+    <SheetSwitcher
+      sheets={userSheets}
+      activeSheetId={activeSheetId}
+      onSwitch={handleSwitchSheet}
+      onAdd={handleAddSheet}
+      onRemove={handleRemoveSheet}
+      onUpdateTag={handleUpdateSheetTag}
+    />
+  )}
         {connected ? (
           renderActiveTab()
         ) : (

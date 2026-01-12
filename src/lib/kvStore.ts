@@ -185,4 +185,59 @@ export class KVStore {
     const ownedBusiness = await this.getBusinessByOwnerId(userId);
     return ownedBusiness ? [ownedBusiness] : [];
   }
+  // Sheet Management - Multiple sheets per user
+async addUserSheet(userId: string, spreadsheetId: string, tag: string): Promise<void> {
+  const sheets = await this.getUserSheets(userId);
+  
+  // Check if sheet already exists
+  const existing = sheets.find(s => s.id === spreadsheetId);
+  if (existing) {
+    // Update tag
+    existing.tag = tag;
+    existing.lastUsed = Date.now();
+  } else {
+    // Add new sheet
+    sheets.push({
+      id: spreadsheetId,
+      tag: tag,
+      addedAt: Date.now(),
+      lastUsed: Date.now()
+    });
+  }
+  
+  await redis.set(`user:${userId}:sheets`, sheets);
+}
+
+async getUserSheets(userId: string): Promise<Array<{id: string, tag: string, addedAt: number, lastUsed: number}>> {
+  const sheets = await redis.get<Array<{id: string, tag: string, addedAt: number, lastUsed: number}>>(`user:${userId}:sheets`);
+  return sheets || [];
+}
+
+async setActiveSheet(userId: string, spreadsheetId: string): Promise<void> {
+  await redis.set(`user:${userId}:activeSheet`, spreadsheetId);
+  
+  // Update lastUsed timestamp
+  const sheets = await this.getUserSheets(userId);
+  const sheet = sheets.find(s => s.id === spreadsheetId);
+  if (sheet) {
+    sheet.lastUsed = Date.now();
+    await redis.set(`user:${userId}:sheets`, sheets);
+  }
+}
+
+async getActiveSheet(userId: string): Promise<string | null> {
+  return await redis.get<string>(`user:${userId}:activeSheet`);
+}
+
+async removeUserSheet(userId: string, spreadsheetId: string): Promise<void> {
+  const sheets = await this.getUserSheets(userId);
+  const filtered = sheets.filter(s => s.id !== spreadsheetId);
+  await redis.set(`user:${userId}:sheets`, filtered);
+  
+  // If removed sheet was active, clear active
+  const active = await this.getActiveSheet(userId);
+  if (active === spreadsheetId) {
+    await redis.del(`user:${userId}:activeSheet`);
+  }
+}
 }
