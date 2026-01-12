@@ -77,29 +77,47 @@ const [activeSheetId, setActiveSheetId] = useState<string | null>(null);
   };
 // Load user's sheets from Redis
 const loadUserSheets = async () => {
-  if (!session?.user) return;
+  if (!session?.user) {
+    console.log('⏭️ No session, skipping sheet load');
+    return;
+  }
+  
+  console.log('👤 Loading user sheets for:', session.user.email);
   
   try {
     const response = await fetch('/api/sheets');
     
     if (!response.ok) {
-      throw new Error('Failed to fetch sheets');
+      console.error('❌ Failed to fetch sheets:', response.status);
+      throw new Error(`Failed to fetch sheets: ${response.status}`);
     }
     
     const data = await response.json();
+    console.log('✅ Sheets loaded:', data);
+    
     setUserSheets(data.sheets || []);
     setActiveSheetId(data.activeSheetId);
     
+    // If user has an active sheet, set it up
     if (data.activeSheetId) {
+      console.log('📊 Setting active sheet:', data.activeSheetId);
       setSheetId(data.activeSheetId);
       const gsService = GoogleSheetsService.getInstance();
       gsService.setSpreadsheetId(data.activeSheetId);
       setConnected(true);
+      
+      // Also save to localStorage as backup
+      localStorage.setItem('medhaSheetId', data.activeSheetId);
     }
+    
   } catch (error) {
-    console.error('Error loading user sheets:', error);
+    console.error('❌ Error loading user sheets:', error);
+    // Don't throw - just set empty state and continue
+    setUserSheets([]);
+    setActiveSheetId(null);
   }
 };
+
 
 // Switch to different sheet
 const handleSwitchSheet = async (spreadsheetId: string) => {
@@ -221,22 +239,39 @@ const handleUpdateSheetTag = async (spreadsheetId: string, newTag: string) => {
   }
 };
 
-  const initializeApp = async () => {
-    try {
-      await loadGoogleScripts();
-      const sheets = GoogleSheetsService.getInstance();
-      const savedSheetId = localStorage.getItem('medhaSheetId');
-      if (savedSheetId) {
-        setSheetId(savedSheetId);
-        sheets.setSpreadsheetId(savedSheetId);
-      }
-      await sheets.initialize();
-      setIsInitializing(false);
-    } catch (error) {
-      console.error('Initialization error:', error);
-      setIsInitializing(false);
+const initializeApp = async () => {
+  console.log('🚀 Starting app initialization...');
+  setIsInitializing(true);
+  
+  try {
+    // Load Google Scripts
+    console.log('📚 Loading Google Scripts...');
+    await loadGoogleScripts();
+    
+    // Initialize Google Sheets Service
+    console.log('📊 Initializing Google Sheets...');
+    const sheets = GoogleSheetsService.getInstance();
+    await sheets.initialize();
+    
+    console.log('✅ Google Sheets initialized');
+    
+    // Check localStorage for saved sheet (fallback)
+    const savedSheetId = localStorage.getItem('medhaSheetId');
+    if (savedSheetId) {
+      console.log('📋 Found saved sheet in localStorage:', savedSheetId);
+      setSheetId(savedSheetId);
+      sheets.setSpreadsheetId(savedSheetId);
+      setConnected(true);
     }
-  };
+    
+  } catch (error) {
+    console.error('❌ Initialization error:', error);
+  } finally {
+    console.log('🏁 App initialization complete');
+    setIsInitializing(false);
+  }
+};
+
 
   const handleConnect = async () => {
     try {
@@ -277,18 +312,46 @@ const handleUpdateSheetTag = async (spreadsheetId: string, newTag: string) => {
   };
 
   // ========== useEffect HOOKS (AFTER FUNCTIONS) ==========
+// Debug logging
+useEffect(() => {
+  console.log('📊 Component State:', {
+    status,
+    isInitializing,
+    connected,
+    hasSession: !!session,
+    userEmail: session?.user?.email,
+    sheetsCount: userSheets.length,
+    activeSheetId
+  });
+}, [status, isInitializing, connected, session, userSheets, activeSheetId]);
 
-  useEffect(() => {
-    initializeApp();
-  }, []);
+ // Initialize app once on mount
+useEffect(() => {
+  console.log('🎬 Component mounted, initializing app...');
+  initializeApp();
+}, []);
 
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/login');
-    } else  if (status === 'authenticated' && session?.user) {
-      loadUserSheets();
-    }
-  }, [status, session]);
+// Handle authentication and sheet loading
+useEffect(() => {
+  console.log('🔐 Auth status changed:', status);
+  
+  if (status === 'loading') {
+    console.log('⏳ Auth still loading...');
+    return;
+  }
+  
+  if (status === 'unauthenticated') {
+    console.log('🚫 User not authenticated, redirecting to login...');
+    router.push('/login');
+    return;
+  }
+  
+  if (status === 'authenticated' && session?.user && !isInitializing) {
+    console.log('✅ User authenticated, loading sheets...');
+    loadUserSheets();
+  }
+}, [status, session, isInitializing, router]);
+
 
   // ========== RENDER ==========
 
