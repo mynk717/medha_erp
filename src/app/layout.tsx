@@ -1,33 +1,27 @@
-// src/app/layout.tsx
-import type { Metadata } from 'next'
-import Script from 'next/script'
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import SessionProvider from './providers/SessionProvider';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Medha ERP - Business Management System',
-  description: 'Complete ERP solution for small businesses',
-}
+  title: 'Medha ERP - Business Management Platform',
+  description: 'Smart ERP system with Google Sheets integration',
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <head>
-        {/* Google API Scripts */}
-        <Script 
-          src="https://apis.google.com/js/api.js" 
-          strategy="beforeInteractive"
-        />
-        <Script 
-          src="https://accounts.google.com/gsi/client" 
-          strategy="beforeInteractive"
-        />
-      </head>
-      <body style={{ margin: 0, padding: 0, fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        {children}
+      <body className={inter.className}>
+        <SessionProvider>
+          {children}
+        </SessionProvider>
       </body>
     </html>
-  )
+  );
 }

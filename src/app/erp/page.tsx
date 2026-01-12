@@ -1,5 +1,7 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { GoogleSheetsService } from '@/lib/googleSheets';
 import Dashboard from '../components/erp/Dashboard';
@@ -30,27 +32,11 @@ export default function ERPPage() {
   const [connected, setConnected] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [sheetId, setSheetId] = useState('');
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    initializeApp();
-  }, []);
-
-  const initializeApp = async () => {
-    try {
-      await loadGoogleScripts();
-      const sheets = GoogleSheetsService.getInstance();
-      const savedSheetId = localStorage.getItem('medhaSheetId');
-      if (savedSheetId) {
-        setSheetId(savedSheetId);
-        sheets.setSpreadsheetId(savedSheetId);
-      }
-      await sheets.initialize();
-      setIsInitializing(false);
-    } catch (error) {
-      console.error('Initialization error:', error);
-      setIsInitializing(false);
-    }
-  };
+  // ========== FUNCTIONS FIRST (BEFORE useEffect) ==========
 
   const loadGoogleScripts = (): Promise<void> => {
     return new Promise((resolve) => {
@@ -84,6 +70,23 @@ export default function ERPPage() {
     });
   };
 
+  const initializeApp = async () => {
+    try {
+      await loadGoogleScripts();
+      const sheets = GoogleSheetsService.getInstance();
+      const savedSheetId = localStorage.getItem('medhaSheetId');
+      if (savedSheetId) {
+        setSheetId(savedSheetId);
+        sheets.setSpreadsheetId(savedSheetId);
+      }
+      await sheets.initialize();
+      setIsInitializing(false);
+    } catch (error) {
+      console.error('Initialization error:', error);
+      setIsInitializing(false);
+    }
+  };
+
   const handleConnect = async () => {
     try {
       const sheets = GoogleSheetsService.getInstance();
@@ -108,17 +111,6 @@ export default function ERPPage() {
     }
   };
 
-  const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'inventory', label: 'Inventory', icon: Package },
-    { id: 'sales', label: 'Sales', icon: ShoppingCart },
-    { id: 'purchases', label: 'Purchases', icon: ShoppingBag },
-    { id: 'invoices', label: 'Invoices', icon: FileText },
-    { id: 'bills', label: 'Bills', icon: Receipt },
-    { id: 'reminders', label: 'Reminders', icon: Bell },
-    { id: 'settings', label: 'Settings', icon: SettingsIcon }
-  ];
-
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'dashboard': return <Dashboard onTabSwitch={setActiveTab} />;
@@ -132,6 +124,38 @@ export default function ERPPage() {
       default: return <Dashboard onTabSwitch={setActiveTab} />;
     }
   };
+
+  // ========== useEffect HOOKS (AFTER FUNCTIONS) ==========
+
+  useEffect(() => {
+    initializeApp();
+  }, []);
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    } else if (status === 'authenticated') {
+      setLoading(false);
+    }
+  }, [status, router]);
+
+  // ========== RENDER ==========
+
+  if (loading || status === 'loading') {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        flexDirection: 'column',
+        gap: '16px'
+      }}>
+        <Loader2 className="w-12 h-12 animate-spin text-indigo-600" />
+        <p style={{ color: '#64748b' }}>Loading your workspace...</p>
+      </div>
+    );
+  }
 
   if (isInitializing) {
     return (
@@ -149,6 +173,17 @@ export default function ERPPage() {
       </div>
     );
   }
+
+  const tabs = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'inventory', label: 'Inventory', icon: Package },
+    { id: 'sales', label: 'Sales', icon: ShoppingCart },
+    { id: 'purchases', label: 'Purchases', icon: ShoppingBag },
+    { id: 'invoices', label: 'Invoices', icon: FileText },
+    { id: 'bills', label: 'Bills', icon: Receipt },
+    { id: 'reminders', label: 'Reminders', icon: Bell },
+    { id: 'settings', label: 'Settings', icon: SettingsIcon }
+  ];
 
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
