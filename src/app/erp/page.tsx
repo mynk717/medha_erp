@@ -37,7 +37,7 @@ export default function ERPPage() {
   const [sheetId, setSheetId] = useState('');
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [userSheets, setUserSheets] = useState<Array<{id: string, tag: string, addedAt: number, lastUsed: number}>>([]);
 const [activeSheetId, setActiveSheetId] = useState<string | null>(null);
@@ -355,7 +355,7 @@ useEffect(() => {
 
   // ========== RENDER ==========
 
-  if (loading || status === 'loading') {
+  if (isInitializing || status === 'loading') {
     return (
       <div style={{
         display: 'flex',
