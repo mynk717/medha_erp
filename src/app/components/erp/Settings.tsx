@@ -27,7 +27,7 @@ export default function Settings() {
   const loadSettings = async () => {
     try {
       const sheets = GoogleSheetsService.getInstance();
-      const data = await sheets.getRange('Settings!A2:J2');
+      const data = await sheets.getRange('Settings!A2:I2');
       
       if (data.length > 0) {
         const row = data[0];
