@@ -64,6 +64,36 @@ export class KVStore {
     }
   }
 
+
+  // Business Settings Management
+async saveBusinessSettings(userId: string, settings: {
+  businessName: string;
+  gstNumber: string;
+  address: string;
+  phone: string;
+  email: string;
+  bankName: string;
+  accountNumber: string;
+  ifsc: string;
+  upiId: string;
+}): Promise<void> {
+  await redis.set(`user:${userId}:settings`, settings);
+}
+
+async getBusinessSettings(userId: string): Promise<{
+  businessName: string;
+  gstNumber: string;
+  address: string;
+  phone: string;
+  email: string;
+  bankName: string;
+  accountNumber: string;
+  ifsc: string;
+  upiId: string;
+} | null> {
+  return await redis.get(`user:${userId}:settings`);
+}
+
   // ==================== BUSINESS OPERATIONS ====================
 
   async createBusiness(ownerId: string, businessData: Omit<Business, 'id' | 'ownerId' | 'createdAt'>): Promise<Business> {
@@ -131,7 +161,7 @@ export class KVStore {
 
   // ==================== TEAM OPERATIONS ====================
 
-  async addTeamMember(businessId: string, userId: string, role: 'owner' | 'admin' | 'viewer'): Promise<TeamMember> {
+  async addTeamMember(businessId: string, userId: string, role: 'owner' | 'admin' | 'viewer'): Promise<TeamMember> {  
     const member: TeamMember = {
       businessId,
       userId,

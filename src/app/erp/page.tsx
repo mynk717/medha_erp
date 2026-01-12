@@ -273,29 +273,51 @@ const initializeApp = async () => {
 };
 
 
-  const handleConnect = async () => {
-    try {
-      const sheets = GoogleSheetsService.getInstance();
-      await sheets.authenticate();
-      
-      const id = prompt(
-        '📋 Enter your Google Sheet ID:\n\n' +
-        'Find it in the URL:\n' +
-        'https://docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit\n\n' +
-        'Paste the ID part only:'
-      );
-      
-      if (id && id.length > 20) {
-        sheets.setSpreadsheetId(id);
-        setSheetId(id);
-        setConnected(true);
-        alert('✅ Connected successfully! You can now use the ERP system.');
-      }
-    } catch (error) {
-      console.error('Connection error:', error);
-      alert('❌ Connection failed. Please try again and make sure you grant permissions.');
+const handleConnect = async () => {
+  try {
+    console.log('🔐 Starting connection process...');
+    
+    // Authenticate with Google
+    const sheets = GoogleSheetsService.getInstance();
+    await sheets.authenticate();
+    
+    console.log('✅ Authentication successful');
+    
+    // Get Sheet ID
+    const id = prompt(
+      '📋 Enter your Google Sheet ID:\n\n' +
+      'Find it in the URL:\n' +
+      'https://docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit\n\n' +
+      'Paste the ID part only:'
+    );
+    
+    if (!id || id.length < 20) {
+      return;
     }
-  };
+
+    // Get sheet tag/name
+    const tag = prompt('Give this sheet a name (e.g., Jan2026, Q1-2026, Main):') || 'My Sheet';
+    
+    // Set up Google Sheets service
+    sheets.setSpreadsheetId(id);
+    setSheetId(id);
+    setConnected(true);
+    
+    // Save to localStorage as backup
+    localStorage.setItem('medhaSheetId', id);
+    
+    // Save to Redis via API (if user is logged in)
+    if (session?.user) {
+      await handleAddSheet(id, tag);
+    }
+    
+    alert('✅ Connected successfully! You can now use the ERP system.');
+  } catch (error) {
+    console.error('Connection error:', error);
+    alert('❌ Connection failed. Please try again and make sure you grant permissions.');
+  }
+};
+
 
   const renderActiveTab = () => {
     switch (activeTab) {

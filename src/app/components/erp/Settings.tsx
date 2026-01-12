@@ -24,60 +24,41 @@ export default function Settings() {
     loadSettings();
   }, []);
 
-  const loadSettings = async () => {
-    try {
-      const sheets = GoogleSheetsService.getInstance();
-      const data = await sheets.getRange('Settings!A2:I2');
-      
-      if (data.length > 0) {
-        const row = data[0];
-        setSettings({
-          name: row[0] || '',
-          gstNumber: row[1] || '',
-          phone: row[2] || '',
-          address: row[3] || '',
-          stateCode: row[4] || '',
-          logo: row[5] || '',
-          invoiceTerms: row[6] || '',
-          gstEnabled: row[7] === 'true' || row[7] === true,
-          defaultGstRate: parseFloat(row[8]) || 18
-        });
-      }
-      
-      setLoading(false);
-    } catch (error) {
-      console.error('Error loading settings:', error);
-      setLoading(false);
-    }
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
+  // Remove Google Sheets logic, use API instead
+const loadSettings = async () => {
+  try {
+    const response = await fetch('/api/settings');
     
-    const sheets = GoogleSheetsService.getInstance();
-    const settingsRow = [
-      settings.name,
-      settings.gstNumber,
-      settings.phone,
-      settings.address,
-      settings.stateCode,
-      settings.logo,
-      settings.invoiceTerms,
-      settings.gstEnabled.toString(),
-      settings.defaultGstRate.toString()
-    ];
-
-    try {
-      await sheets.updateRow('Settings!A2:I2', settingsRow);
-      alert('✅ Settings saved successfully!');
-    } catch (error) {
-      console.error('Error saving settings:', error);
-      alert('❌ Failed to save settings');
-    } finally {
-      setSaving(false);
+    if (!response.ok) {
+      throw new Error('Failed to load settings');
     }
-  };
+    
+    const data = await response.json();
+    setSettings(data.settings);
+  } catch (error) {
+    console.error('Error loading settings:', error);
+    alert('Failed to load settings');
+  }
+};
+
+const handleSave = async () => {
+  try {
+    const response = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(settings)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to save settings');
+    }
+    
+    alert('✅ Settings saved successfully!');
+  } catch (error) {
+    console.error('Error saving settings:', error);
+    alert('❌ Failed to save settings');
+  }
+};
 
   if (loading) {
     return <div style={{ padding: '40px', textAlign: 'center' }}>Loading settings...</div>;
