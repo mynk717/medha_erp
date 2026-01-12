@@ -748,8 +748,8 @@ useEffect(() => {
                 style={{ borderRadius: '12px' }}
               />
             </div>
-            <h2 style={{ color: '#1e40af', marginBottom: '16px' }}>Welcome to Medha ERP</h2>
-            <p style={{ color: '#64748b', marginBottom: '32px', fontSize: '18px' }}>
+            <h2 style={{ color: '#1e293b', marginBottom: '16px', fontWeight: 700 }}>Welcome to Medha ERP</h2>
+<p style={{ color: '#475569', marginBottom: '32px', fontSize: '18px' }}>
               Connect your Google Sheet to get started
             </p>
             
@@ -764,7 +764,7 @@ useEffect(() => {
               margin: '0 auto 24px'
             }}>
               <h3 style={{ color: '#1e40af', margin: '0 0 12px 0' }}>📋 First Time Setup</h3>
-              <ol style={{ margin: 0, color: '#334155', paddingLeft: '20px' }}>
+              <ol style={{ margin: 0, color: '#1e293b', paddingLeft: '20px', fontWeight: 500 }}>
                 <li>
                   <strong>Create a sheet:</strong>{' '}
                   <a 
@@ -778,7 +778,7 @@ useEffect(() => {
                 </li>
                 <li style={{ marginTop: '8px' }}>
                   <strong>Get your Sheet ID:</strong> Copy from URL:{' '}
-                  <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+                  <code style={{ background: '#1e293b', padding: '2px 6px', borderRadius: '4px' }}>
                     docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit
                   </code>
                 </li>
