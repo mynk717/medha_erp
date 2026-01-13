@@ -41,7 +41,7 @@ export class GoogleSheetsService {
         return;
       }
   
-      // ✅ Check if we have a valid cached token first
+      // ✅ Check localStorage first (fast)
       const storedToken = localStorage.getItem('gapi_access_token');
       const tokenExpiry = localStorage.getItem('gapi_token_expiry');
       
@@ -49,53 +49,88 @@ export class GoogleSheetsService {
         const expiryTime = parseInt(tokenExpiry);
         const now = Date.now();
         
-        // If token is still valid (with 5-minute buffer)
         if (now < expiryTime - (5 * 60 * 1000)) {
           console.log('✅ Using cached access token');
           this.accessToken = storedToken;
           window.gapi.client.setToken({ access_token: storedToken });
           resolve(storedToken);
           return;
-        } else {
-          console.log('⏰ Token expired, requesting new one...');
-          // Clear expired token
-          localStorage.removeItem('gapi_access_token');
-          localStorage.removeItem('gapi_token_expiry');
         }
       }
   
-      // Request new token
-      const client = window.google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: 'https://www.googleapis.com/auth/spreadsheets',
-        callback: (response: any) => {
-          if (response.error) {
-            console.error('❌ Auth error:', response.error);
-            reject(response.error);
-            return;
-          }
+      // ✅ If no localStorage token, check Redis
+      this.checkRedisToken().then(redisToken => {
+        if (redisToken) {
+          this.accessToken = redisToken;
+          window.gapi.client.setToken({ access_token: redisToken });
           
-          // Store token with expiry time
-          this.accessToken = response.access_token;
-          
-          // ✅ Calculate expiry (default is 3600 seconds = 1 hour)
-          const expiresIn = response.expires_in || 3600;
-          const expiryTime = Date.now() + (expiresIn * 1000);
-          
-          // ✅ Save to localStorage for reuse
-          localStorage.setItem('gapi_access_token', this.accessToken);
+          // Save to localStorage for quick access
+          const expiryTime = Date.now() + (3600 * 1000);
+          localStorage.setItem('gapi_access_token', redisToken);
           localStorage.setItem('gapi_token_expiry', expiryTime.toString());
           
-          window.gapi.client.setToken({ access_token: this.accessToken });
-          
-          console.log('✅ New access token obtained, expires in', expiresIn, 'seconds');
-          resolve(this.accessToken);
+          resolve(redisToken);
+          return;
         }
+        
+        // No valid token anywhere - request new one
+        this.requestNewToken(resolve, reject);
       });
-  
-      client.requestAccessToken();
     });
   }
+  
+  private async checkRedisToken(): Promise<string | null> {
+    try {
+      const response = await fetch('/api/google-token');
+      if (!response.ok) return null;
+      
+      const data = await response.json();
+      return data.token || null;
+    } catch (error) {
+      console.error('Error checking Redis token:', error);
+      return null;
+    }
+  }
+  
+  private requestNewToken(resolve: Function, reject: Function) {
+    const client = window.google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: 'https://www.googleapis.com/auth/spreadsheets',
+      callback: async (response: any) => {
+        if (response.error) {
+          console.error('❌ Auth error:', response.error);
+          reject(response.error);
+          return;
+        }
+        
+        this.accessToken = response.access_token;
+        const expiresIn = response.expires_in || 3600;
+        const expiryTime = Date.now() + (expiresIn * 1000);
+        
+        // ✅ Save to localStorage
+        localStorage.setItem('gapi_access_token', this.accessToken);
+        localStorage.setItem('gapi_token_expiry', expiryTime.toString());
+        
+        // ✅ Save to Redis
+        await fetch('/api/google-token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            token: this.accessToken,
+            expiresAt: expiryTime
+          })
+        });
+        
+        window.gapi.client.setToken({ access_token: this.accessToken });
+        
+        console.log('✅ New access token obtained');
+        resolve(this.accessToken);
+      }
+    });
+  
+    client.requestAccessToken();
+  }
+  
 
   // ✅ Helper method to auto-retry on 403 errors
   private async retryWithReauth<T>(operation: () => Promise<T>): Promise<T> {

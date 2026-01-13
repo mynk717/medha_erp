@@ -15,6 +15,7 @@ export class KVStore {
 
   // ==================== USER OPERATIONS ====================
   
+  
   async createUser(googleId: string, email: string, name: string, picture: string): Promise<User> {
     const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
@@ -79,6 +80,7 @@ async saveBusinessSettings(userId: string, settings: {
 }): Promise<void> {
   await redis.set(`user:${userId}:settings`, settings);
 }
+
 
 async getBusinessSettings(userId: string): Promise<{
   businessName: string;
@@ -270,4 +272,30 @@ async removeUserSheet(userId: string, spreadsheetId: string): Promise<void> {
     await redis.del(`user:${userId}:activeSheet`);
   }
 }
+// ==================== GOOGLE TOKEN MANAGEMENT ====================
+
+async getGoogleToken(userId: string): Promise<{ token: string; expiresAt: number } | null> {
+  try {
+    const data = await redis.get(`user:${userId}:google_token`);
+    return data ? (data as { token: string; expiresAt: number }) : null;
+  } catch (error) {
+    console.error('Error getting Google token:', error);
+    return null;
+  }
+}
+
+async saveGoogleToken(userId: string, tokenData: { token: string; expiresAt: number }): Promise<void> {
+  try {
+    // Store with TTL of 1 hour (3600 seconds)
+    await redis.setex(
+      `user:${userId}:google_token`,
+      3600,
+      JSON.stringify(tokenData)
+    );
+  } catch (error) {
+    console.error('Error saving Google token:', error);
+    throw error;
+  }
+}
+
 }
