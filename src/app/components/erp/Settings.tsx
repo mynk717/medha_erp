@@ -100,9 +100,9 @@ const handleSave = async () => {
               style={{
                 width: '100%',
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
           </div>
@@ -128,9 +128,9 @@ const handleSave = async () => {
               style={{
                 width: '100%',
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
           </div>
@@ -156,9 +156,9 @@ const handleSave = async () => {
               style={{
                 width: '100%',
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
           </div>
@@ -185,9 +185,9 @@ const handleSave = async () => {
               style={{
                 width: '100%',
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px',
+                fontSize: '16px', color: '#1e293b',
                 resize: 'vertical',
                 fontFamily: 'inherit'
               }}
@@ -216,12 +216,12 @@ const handleSave = async () => {
               style={{
                 width: '100%',
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
-            <small style={{ color: '#64748b', fontSize: '12px' }}>e.g., 22 for Chhattisgarh</small>
+            <small style={{ color: '#1e293b', fontSize: '12px' }}>e.g., 22 for Chhattisgarh</small>
           </div>
 
           {/* Logo URL */}
@@ -245,9 +245,9 @@ const handleSave = async () => {
               style={{
                 width: '100%',
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
           </div>
@@ -294,9 +294,9 @@ const handleSave = async () => {
                   onChange={(e) => setSettings({ ...settings, defaultGstRate: parseFloat(e.target.value) })}
                   style={{
                     padding: '14px',
-                    border: '2px solid #e2e8f0',
+                    border: '2px solid #cbd5e1',
                     borderRadius: '8px',
-                    fontSize: '16px',
+                    fontSize: '16px', color: '#1e293b',
                     width: '200px'
                   }}
                 >
@@ -306,7 +306,7 @@ const handleSave = async () => {
                   <option value="18">18%</option>
                   <option value="28">28%</option>
                 </select>
-                <p style={{ fontSize: '12px', color: '#64748b', marginTop: '8px' }}>
+                <p style={{ fontSize: '12px', color: '#1e293b', marginTop: '8px' }}>
                   For intra-state: CGST ({settings.defaultGstRate / 2}%) + SGST ({settings.defaultGstRate / 2}%)<br />
                   For inter-state: IGST ({settings.defaultGstRate}%)
                 </p>
@@ -335,9 +335,9 @@ const handleSave = async () => {
               style={{
                 width: '100%',
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px',
+                fontSize: '16px', color: '#1e293b',
                 resize: 'vertical',
                 fontFamily: 'inherit'
               }}

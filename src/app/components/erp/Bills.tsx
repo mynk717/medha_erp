@@ -177,7 +177,7 @@ export default function Bills() {
                       {isOverdue && bill.status === 'Pending' ? 'Overdue' : bill.status}
                     </span>
                   </td>
-                  <td style={{ padding: '12px', fontSize: '12px', color: '#64748b' }}>{bill.notes}</td>
+                  <td style={{ padding: '12px', fontSize: '12px', color: '#1e293b' }}>{bill.notes}</td>
                   <td style={{ padding: '12px' }}>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       {bill.status === 'Pending' && (
@@ -264,7 +264,7 @@ export default function Bills() {
       </div>
 
       {/* Add Bill Form */}
-      <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px' }}>
+      <div style={{ background: '#ffffff', padding: '24px', borderRadius: '12px' }}>
         <h3 style={{ color: '#1e293b', marginBottom: '16px' }}>➕ Record New Bill</h3>
         <form onSubmit={handleSubmit}>
           <div style={{ 
@@ -280,9 +280,9 @@ export default function Bills() {
               required
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -293,9 +293,9 @@ export default function Bills() {
               required
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -308,9 +308,9 @@ export default function Bills() {
               min="0"
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -320,9 +320,9 @@ export default function Bills() {
               required
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -332,9 +332,9 @@ export default function Bills() {
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px',
+                fontSize: '16px', color: '#1e293b',
                 gridColumn: 'span 2'
               }}
             />
@@ -349,7 +349,7 @@ export default function Bills() {
               border: 'none',
               cursor: 'pointer',
               fontWeight: '600',
-              fontSize: '16px'
+              fontSize: '16px', color: '#1e293b'
             }}
           >
             ✅ Record Bill
@@ -414,7 +414,7 @@ export default function Bills() {
             <div style={{ padding: '40px' }} className="print-content">
               <div style={{ textAlign: 'center', marginBottom: '32px' }}>
                 <h1 style={{ color: '#1e293b', margin: '0 0 8px 0' }}>BILL</h1>
-                <p style={{ color: '#64748b', margin: 0 }}>Medha Sanitary & Hardware</p>
+                <p style={{ color: '#1e293b', margin: 0 }}>Medha Sanitary & Hardware</p>
               </div>
 
               <div style={{ 
@@ -427,20 +427,20 @@ export default function Bills() {
                 borderRadius: '8px'
               }}>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Bill ID</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.id}</p>
+                  <p style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: '14px' }}>Bill ID</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>{previewBill.id}</p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Date</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.date}</p>
+                  <p style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: '14px' }}>Date</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>{previewBill.date}</p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Supplier</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.supplier}</p>
+                  <p style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: '14px' }}>Supplier</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>{previewBill.supplier}</p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', color: '#64748b', fontSize: '14px' }}>Due Date</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.dueDate}</p>
+                  <p style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: '14px' }}>Due Date</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>{previewBill.dueDate}</p>
                 </div>
               </div>
 
@@ -451,7 +451,7 @@ export default function Bills() {
                 marginBottom: '24px'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <p style={{ margin: 0, fontSize: '18px', color: '#64748b' }}>Total Amount</p>
+                  <p style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>Total Amount</p>
                   <p style={{ margin: 0, fontSize: '32px', fontWeight: 'bold', color: '#1e293b' }}>
                     {formatCurrency(previewBill.total)}
                   </p>
@@ -470,7 +470,7 @@ export default function Bills() {
                 paddingTop: '16px', 
                 borderTop: '1px solid #e5e7eb',
                 fontSize: '12px',
-                color: '#64748b',
+                color: '#1e293b',
                 textAlign: 'center'
               }}>
                 <p style={{ margin: 0 }}>Generated by Medha ERP System</p>

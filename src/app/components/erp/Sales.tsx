@@ -192,7 +192,7 @@ export default function Sales() {
       </div>
 
       {/* Add Sale Form */}
-      <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px' }}>
+      <div style={{ background: '#ffffff', padding: '24px', borderRadius: '12px' }}>
         <h3 style={{ color: '#1e293b', marginBottom: '16px' }}>➕ Record New Sale</h3>
         <form onSubmit={handleSubmit}>
           <div style={{ 
@@ -208,9 +208,9 @@ export default function Sales() {
               required
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -221,9 +221,9 @@ export default function Sales() {
               required
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -233,9 +233,9 @@ export default function Sales() {
               onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <select
@@ -244,9 +244,9 @@ export default function Sales() {
               required
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             >
               <option value="">Select Item *</option>
@@ -265,9 +265,9 @@ export default function Sales() {
               min="1"
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -280,9 +280,9 @@ export default function Sales() {
               min="0"
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
           </div>
@@ -299,7 +299,7 @@ export default function Sales() {
               border: 'none',
               cursor: 'pointer',
               fontWeight: '600',
-              fontSize: '16px'
+              fontSize: '16px', color: '#1e293b'
             }}
           >
             ✅ Record Sale

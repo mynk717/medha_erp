@@ -148,7 +148,7 @@ export default function Inventory() {
       </div>
 
       {/* Add Item Form */}
-      <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px' }}>
+      <div style={{ background: '#ffffff', padding: '24px', borderRadius: '12px' }}>
         <h3 style={{ color: '#1e293b', marginBottom: '16px' }}>➕ Add New Item</h3>
         <form onSubmit={handleSubmit}>
           <div style={{ 
@@ -165,9 +165,9 @@ export default function Inventory() {
               required
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -178,9 +178,9 @@ export default function Inventory() {
               required
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -192,9 +192,9 @@ export default function Inventory() {
               min="0"
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -206,9 +206,9 @@ export default function Inventory() {
               min="0"
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
             <input
@@ -220,9 +220,9 @@ export default function Inventory() {
               min="0"
               style={{
                 padding: '14px',
-                border: '2px solid #e2e8f0',
+                border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px', color: '#1e293b'
               }}
             />
           </div>
@@ -236,7 +236,7 @@ export default function Inventory() {
               border: 'none',
               cursor: 'pointer',
               fontWeight: '600',
-              fontSize: '16px'
+              fontSize: '16px', color: '#1e293b'
             }}
           >
             ➕ Add Item
