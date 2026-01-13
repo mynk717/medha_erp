@@ -1,13 +1,21 @@
-// src/app/components/erp/Dashboard.tsx - COMPLETE FIXED VERSION
+// src/app/components/erp/Dashboard.tsx - FIXED WITH ICONS + BETTER CONTRAST
 'use client';
 
 import React, { useEffect, useState } from 'react';
 import { DashboardStats, InventoryItem } from '@/types/erp';
 import { GoogleSheetsService } from '@/lib/googleSheets';
 import { formatCurrency } from '@/lib/calculations';
+// ✅ ADD THESE ICON IMPORTS
+import { 
+  TrendingUp, 
+  Zap, 
+  AlertTriangle, 
+  Users,
+  DollarSign
+} from 'lucide-react';
 
 interface DashboardProps {
-  onTabSwitch?: (tab: string) => void;  // ← Changed to OPTIONAL with ?
+  onTabSwitch?: (tab: string) => void;
 }
 
 export default function Dashboard({ onTabSwitch }: DashboardProps) {
@@ -65,61 +73,61 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
 
       const lowStock = inventory.filter(item => item.stock < 5);
 
-            // Calculate GST Summary
-            let totalCGST = 0;
-            let totalSGST = 0;
-            let totalIGST = 0;
-            
-            monthSales.forEach(sale => {
-              const subtotal = sale.total / 1.18;
-              const gst = sale.total - subtotal;
-              totalCGST += gst / 2;
-              totalSGST += gst / 2;
-            });
-            
-            setGstSummary({
-              totalCGST,
-              totalSGST,
-              totalIGST,
-              totalSales: monthTotal,
-              totalGST: totalCGST + totalSGST + totalIGST
-            });
+      // Calculate GST Summary
+      let totalCGST = 0;
+      let totalSGST = 0;
+      let totalIGST = 0;
       
-            // Calculate Top Customers
-            const customerMap = new Map<string, { total: number; count: number }>();
-            
-            sales.forEach(sale => {
-              const existing = customerMap.get(sale.customer) || { total: 0, count: 0 };
-              customerMap.set(sale.customer, {
-                total: existing.total + sale.total,
-                count: existing.count + 1
-              });
-            });
-            
-            const sorted = Array.from(customerMap.entries())
-              .map(([name, data]) => ({
-                name,
-                totalPurchases: data.total,
-                orderCount: data.count
-              }))
-              .sort((a, b) => b.totalPurchases - a.totalPurchases)
-              .slice(0, 5);
-            
-            setTopCustomers(sorted);
+      monthSales.forEach(sale => {
+        const subtotal = sale.total / 1.18;
+        const gst = sale.total - subtotal;
+        totalCGST += gst / 2;
+        totalSGST += gst / 2;
+      });
       
-            setStats({
-              todaySales: todayTotal,
-              todayCount: todaySales.length,
-              monthSales: monthTotal,
-              monthCount: monthSales.length,
-              pendingAmount: pendingTotal,
-              pendingCount: pending.length,
-              lowStockCount: lowStock.length,
-              lowStockItems: lowStock
-            });
-            
-            setLoading(false);
+      setGstSummary({
+        totalCGST,
+        totalSGST,
+        totalIGST,
+        totalSales: monthTotal,
+        totalGST: totalCGST + totalSGST + totalIGST
+      });
+
+      // Calculate Top Customers
+      const customerMap = new Map<string, { total: number; count: number }>();
       
+      sales.forEach(sale => {
+        const existing = customerMap.get(sale.customer) || { total: 0, count: 0 };
+        customerMap.set(sale.customer, {
+          total: existing.total + sale.total,
+          count: existing.count + 1
+        });
+      });
+      
+      const sorted = Array.from(customerMap.entries())
+        .map(([name, data]) => ({
+          name,
+          totalPurchases: data.total,
+          orderCount: data.count
+        }))
+        .sort((a, b) => b.totalPurchases - a.totalPurchases)
+        .slice(0, 5);
+      
+      setTopCustomers(sorted);
+
+      setStats({
+        todaySales: todayTotal,
+        todayCount: todaySales.length,
+        monthSales: monthTotal,
+        monthCount: monthSales.length,
+        pendingAmount: pendingTotal,
+        pendingCount: pending.length,
+        lowStockCount: lowStock.length,
+        lowStockItems: lowStock
+      });
+      
+      setLoading(false);
+
     } catch (error) {
       console.error('Error loading dashboard:', error);
       setLoading(false);
@@ -132,7 +140,18 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
 
   return (
     <div>
-      <h2 style={{ color: '#1e40af', marginBottom: '20px' }}>📊 Business Dashboard</h2>
+      {/* ✅ FIXED: Replaced emoji with icon */}
+      <h2 style={{ 
+        color: '#1e293b',  // ← Changed from #1e40af for better contrast
+        marginBottom: '20px',
+        fontWeight: 700,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px'
+      }}>
+        <TrendingUp className="w-6 h-6" style={{ color: '#6366f1' }} />
+        Business Dashboard
+      </h2>
       
       {/* Stats Cards */}
       <div style={{ 
@@ -149,9 +168,26 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
           borderRadius: '12px',
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '8px' }}>Today&apos;s Sales</div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>{formatCurrency(stats.todaySales)}</div>
-          <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>{stats.todayCount} orders</div>
+          {/* ✅ FIXED: Better text contrast */}
+          <div style={{ 
+            fontSize: '14px', 
+            fontWeight: 600,  // ← Added weight
+            color: 'rgba(255,255,255,0.95)',  // ← Changed from opacity: 0.9
+            marginBottom: '8px' 
+          }}>
+            Today&apos;s Sales
+          </div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>
+            {formatCurrency(stats.todaySales)}
+          </div>
+          <div style={{ 
+            fontSize: '13px',  // ← Increased from 12px
+            fontWeight: 500,  // ← Added weight
+            color: 'rgba(255,255,255,0.9)',  // ← Better than opacity: 0.8
+            marginTop: '4px' 
+          }}>
+            {stats.todayCount} orders
+          </div>
         </div>
 
         {/* This Month */}
@@ -162,9 +198,25 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
           borderRadius: '12px',
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '8px' }}>This Month</div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>{formatCurrency(stats.monthSales)}</div>
-          <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>{stats.monthCount} orders</div>
+          <div style={{ 
+            fontSize: '14px', 
+            fontWeight: 600,
+            color: 'rgba(255,255,255,0.95)',
+            marginBottom: '8px' 
+          }}>
+            This Month
+          </div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>
+            {formatCurrency(stats.monthSales)}
+          </div>
+          <div style={{ 
+            fontSize: '13px',
+            fontWeight: 500,
+            color: 'rgba(255,255,255,0.9)',
+            marginTop: '4px' 
+          }}>
+            {stats.monthCount} orders
+          </div>
         </div>
 
         {/* Pending Payments */}
@@ -175,9 +227,25 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
           borderRadius: '12px',
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '8px' }}>Pending Payments</div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>{formatCurrency(stats.pendingAmount)}</div>
-          <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>{stats.pendingCount} invoices</div>
+          <div style={{ 
+            fontSize: '14px', 
+            fontWeight: 600,
+            color: 'rgba(255,255,255,0.95)',
+            marginBottom: '8px' 
+          }}>
+            Pending Payments
+          </div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>
+            {formatCurrency(stats.pendingAmount)}
+          </div>
+          <div style={{ 
+            fontSize: '13px',
+            fontWeight: 500,
+            color: 'rgba(255,255,255,0.9)',
+            marginTop: '4px' 
+          }}>
+            {stats.pendingCount} invoices
+          </div>
         </div>
 
         {/* Low Stock */}
@@ -188,12 +256,28 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
           borderRadius: '12px',
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '8px' }}>Low Stock Alerts</div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>{stats.lowStockCount}</div>
-          <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '4px' }}>Items below 5 units</div>
+          <div style={{ 
+            fontSize: '14px', 
+            fontWeight: 600,
+            color: 'rgba(255,255,255,0.95)',
+            marginBottom: '8px' 
+          }}>
+            Low Stock Alerts
+          </div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>
+            {stats.lowStockCount}
+          </div>
+          <div style={{ 
+            fontSize: '13px',
+            fontWeight: 500,
+            color: 'rgba(255,255,255,0.9)',
+            marginTop: '4px' 
+          }}>
+            Items below 5 units
+          </div>
         </div>
 
-        {/* GST Summary Card - NOW INSIDE THE GRID */}
+        {/* GST Summary Card */}
         <div style={{
           background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
           color: 'white',
@@ -201,17 +285,40 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
           borderRadius: '12px',
           boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
         }}>
-          <div style={{ fontSize: '14px', opacity: 0.9, marginBottom: '8px' }}>This Month GST</div>
-          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>{formatCurrency(gstSummary.totalGST)}</div>
-          <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '8px' }}>
+          <div style={{ 
+            fontSize: '14px', 
+            fontWeight: 600,
+            color: 'rgba(255,255,255,0.95)',
+            marginBottom: '8px' 
+          }}>
+            This Month GST
+          </div>
+          <div style={{ fontSize: '32px', fontWeight: 'bold' }}>
+            {formatCurrency(gstSummary.totalGST)}
+          </div>
+          <div style={{ 
+            fontSize: '13px',
+            fontWeight: 500,
+            color: 'rgba(255,255,255,0.9)',
+            marginTop: '8px' 
+          }}>
             CGST: {formatCurrency(gstSummary.totalCGST)} | SGST: {formatCurrency(gstSummary.totalSGST)}
           </div>
         </div>
       </div>
-      {/* ↑ GRID CLOSES HERE */}
 
-      {/* Quick Actions */}
-      <h3 style={{ color: '#1e40af', marginBottom: '16px' }}>⚡ Quick Actions</h3>
+      {/* ✅ FIXED: Quick Actions with icon */}
+      <h3 style={{ 
+        color: '#1e293b',  // ← Changed from #1e40af
+        marginBottom: '16px',
+        fontWeight: 700,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px'
+      }}>
+        <Zap className="w-5 h-5" style={{ color: '#f59e0b' }} />
+        Quick Actions
+      </h3>
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '30px' }}>
         <button 
           onClick={() => onTabSwitch?.('sales')}
@@ -255,6 +362,7 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
         >
           + Add Item
         </button>
+        {/* ✅ FIXED: Replaced emoji with icon */}
         <button 
           onClick={() => onTabSwitch?.('invoices')}
           style={{
@@ -264,36 +372,85 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
             borderRadius: '8px',
             border: 'none',
             cursor: 'pointer',
-            fontWeight: '600'
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
           }}
         >
-          💰 View Pending
+          <DollarSign className="w-4 h-4" />
+          View Pending
         </button>
       </div>
 
-      {/* Low Stock Items */}
+      {/* ✅ FIXED: Low Stock Items with icon */}
       {stats.lowStockCount > 0 && (
         <div>
-          <h3 style={{ color: '#ef4444', marginBottom: '16px' }}>⚠️ Low Stock Items</h3>
+          <h3 style={{ 
+            color: '#dc2626',  // ← Changed from #ef4444 for better contrast
+            marginBottom: '16px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <AlertTriangle className="w-5 h-5" />
+            Low Stock Items
+          </h3>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#f9fafb' }}>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Name</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>SKU</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Current Stock</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Action</th>
+              {/* ✅ FIXED: Darker header background */}
+              <tr style={{ background: '#1e293b' }}>
+                <th style={{ 
+                  padding: '12px', 
+                  textAlign: 'left', 
+                  borderBottom: '2px solid #cbd5e1',
+                  color: '#ffffff',  // ← White text on dark bg
+                  fontWeight: 700
+                }}>Name</th>
+                <th style={{ 
+                  padding: '12px', 
+                  textAlign: 'left', 
+                  borderBottom: '2px solid #cbd5e1',
+                  color: '#ffffff',
+                  fontWeight: 700
+                }}>SKU</th>
+                <th style={{ 
+                  padding: '12px', 
+                  textAlign: 'left', 
+                  borderBottom: '2px solid #cbd5e1',
+                  color: '#ffffff',
+                  fontWeight: 700
+                }}>Current Stock</th>
+                <th style={{ 
+                  padding: '12px', 
+                  textAlign: 'left', 
+                  borderBottom: '2px solid #cbd5e1',
+                  color: '#ffffff',
+                  fontWeight: 700
+                }}>Action</th>
               </tr>
             </thead>
             <tbody>
               {stats.lowStockItems.map((item) => (
                 <tr key={item.id}>
-                  <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{item.name}</td>
-                  <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>{item.sku}</td>
                   <td style={{ 
                     padding: '12px', 
                     borderBottom: '1px solid #e5e7eb',
-                    color: item.stock < 3 ? '#ef4444' : '#f59e0b',
-                    fontWeight: 'bold'
+                    color: '#1e293b',  // ← Darker text
+                    fontWeight: 500
+                  }}>{item.name}</td>
+                  <td style={{ 
+                    padding: '12px', 
+                    borderBottom: '1px solid #e5e7eb',
+                    color: '#475569',
+                    fontWeight: 500
+                  }}>{item.sku}</td>
+                  <td style={{ 
+                    padding: '12px', 
+                    borderBottom: '1px solid #e5e7eb',
+                    color: item.stock < 3 ? '#dc2626' : '#f59e0b',
+                    fontWeight: 700
                   }}>
                     {item.stock}
                   </td>
@@ -307,7 +464,8 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
                         borderRadius: '4px',
                         border: 'none',
                         cursor: 'pointer',
-                        fontSize: '12px'
+                        fontSize: '12px',
+                        fontWeight: 600
                       }}
                     >
                       Order Now
@@ -319,28 +477,68 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
           </table>
         </div>
       )}
-      {/* ↑ LOW STOCK SECTION CLOSES HERE */}
 
-      {/* Top Customers */}
+      {/* ✅ FIXED: Top Customers with icon */}
       {topCustomers.length > 0 && (
         <div style={{ marginTop: '30px' }}>
-          <h3 style={{ color: '#1e40af', marginBottom: '16px' }}>👥 Top 5 Customers</h3>
+          <h3 style={{ 
+            color: '#1e293b',  // ← Changed from #1e40af
+            marginBottom: '16px',
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <Users className="w-5 h-5" style={{ color: '#6366f1' }} />
+            Top 5 Customers
+          </h3>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
-              <tr style={{ background: '#f9fafb' }}>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Customer</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Total Purchases</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>Orders</th>
+              {/* ✅ FIXED: Darker header */}
+              <tr style={{ background: '#1e293b' }}>
+                <th style={{ 
+                  padding: '12px', 
+                  textAlign: 'left', 
+                  borderBottom: '2px solid #cbd5e1',
+                  color: '#ffffff',
+                  fontWeight: 700
+                }}>Customer</th>
+                <th style={{ 
+                  padding: '12px', 
+                  textAlign: 'left', 
+                  borderBottom: '2px solid #cbd5e1',
+                  color: '#ffffff',
+                  fontWeight: 700
+                }}>Total Purchases</th>
+                <th style={{ 
+                  padding: '12px', 
+                  textAlign: 'left', 
+                  borderBottom: '2px solid #cbd5e1',
+                  color: '#ffffff',
+                  fontWeight: 700
+                }}>Orders</th>
               </tr>
             </thead>
             <tbody>
               {topCustomers.map(customer => (
                 <tr key={customer.name} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <td style={{ padding: '12px', fontWeight: '600' }}>{customer.name}</td>
-                  <td style={{ padding: '12px', fontWeight: 'bold', color: '#10b981' }}>
+                  <td style={{ 
+                    padding: '12px', 
+                    fontWeight: 600,
+                    color: '#1e293b'  // ← Darker text
+                  }}>{customer.name}</td>
+                  <td style={{ 
+                    padding: '12px', 
+                    fontWeight: 700, 
+                    color: '#059669'  // ← Darker green
+                  }}>
                     {formatCurrency(customer.totalPurchases)}
                   </td>
-                  <td style={{ padding: '12px' }}>{customer.orderCount}</td>
+                  <td style={{ 
+                    padding: '12px',
+                    color: '#475569',
+                    fontWeight: 500
+                  }}>{customer.orderCount}</td>
                 </tr>
               ))}
             </tbody>
