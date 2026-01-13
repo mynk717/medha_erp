@@ -68,7 +68,7 @@ const handleSave = async () => {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <Building2 className="w-8 h-8 text-indigo-600" />
-        <h2 style={{ color: '#1e40af', margin: 0 }}>Business Settings</h2>
+        <h2 style={{ color: '#1e293b', margin: 0 }}>Business Settings</h2>
       </div>
       
       <form onSubmit={handleSave}>
@@ -86,7 +86,7 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e40af'
+              color: '#1e293b'
             }}>
               <Building2 className="w-4 h-4" />
               Business Name *
@@ -115,7 +115,7 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e40af'
+              color: '#1e293b'
             }}>
               <FileText className="w-4 h-4" />
               GST Number
@@ -143,7 +143,7 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e40af'
+              color: '#1e293b'
             }}>
               <Phone className="w-4 h-4" />
               Phone
@@ -171,7 +171,7 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e40af'
+              color: '#1e293b'
             }}>
               <MapPin className="w-4 h-4" />
               Address *
@@ -202,7 +202,7 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e40af'
+              color: '#1e293b'
             }}>
               <MapPin className="w-4 h-4" />
               State Code (for GST)
@@ -232,7 +232,7 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e40af'
+              color: '#1e293b'
             }}>
               <Globe className="w-4 h-4" />
               Logo URL (optional)
@@ -261,7 +261,7 @@ const handleSave = async () => {
             border: '2px solid #3b82f6'
           }}>
             <h3 style={{ 
-              color: '#1e40af', 
+              color: '#1e293b', 
               margin: '0 0 16px 0',
               display: 'flex',
               alignItems: 'center',
@@ -322,7 +322,7 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e40af'
+              color: '#1e293b'
             }}>
               <FileText className="w-4 h-4" />
               Invoice Terms & Conditions

@@ -454,7 +454,7 @@ export default function Dashboard({ onTabSwitch }: DashboardProps) {
                   }}>
                     {item.stock}
                   </td>
-                  <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }}>
+                  <td style={{ padding: '12px', color: '#ffffff', fontWeight: 700, borderBottom: '1px solid #e5e7eb' }}>
                     <button
                       onClick={() => onTabSwitch?.('purchases')}
                       style={{

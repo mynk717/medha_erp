@@ -221,7 +221,7 @@ export default function Reminders() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Bell className="w-8 h-8 text-indigo-600" />
-          <h2 style={{ color: '#1e40af', margin: 0 }}>Payment Reminders</h2>
+          <h2 style={{ color: '#1e293b', margin: 0 }}>Payment Reminders</h2>
         </div>
         {!configured ? (
           <button
@@ -332,9 +332,9 @@ export default function Reminders() {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
             <DollarSign className="w-6 h-6 text-blue-600" />
-            <h3 style={{ margin: 0, color: '#1e40af' }}>Upcoming (3 days)</h3>
+            <h3 style={{ margin: 0, color: '#1e293b' }}>Upcoming (3 days)</h3>
           </div>
-          <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e40af', margin: 0 }}>
+          <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e293b', margin: 0 }}>
             {upcomingInvoices.length}
           </p>
           <p style={{ fontSize: '14px', color: '#1e3a8a', margin: '4px 0 0 0' }}>

@@ -99,21 +99,21 @@ export default function Purchases() {
 
   return (
     <div>
-      <h2 style={{ color: '#1e40af', marginBottom: '20px' }}>💰 Purchase Management</h2>
+      <h2 style={{ color: '#1e293b', marginBottom: '20px' }}>💰 Purchase Management</h2>
       
       {/* Purchases Table */}
       <div style={{ overflowX: 'auto', marginBottom: '30px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: '#f9fafb' }}>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>ID</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Date</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Supplier</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Item</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Qty</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Cost/Unit</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Total</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Status</th>
+            <tr style={{ background: '#1e293b' }}>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>ID</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Date</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Supplier</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Item</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Qty</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Cost/Unit</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Total</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -146,7 +146,7 @@ export default function Purchases() {
 
       {/* Add Purchase Form */}
       <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px' }}>
-        <h3 style={{ color: '#1e40af', marginBottom: '16px' }}>➕ Record New Purchase</h3>
+        <h3 style={{ color: '#1e293b', marginBottom: '16px' }}>➕ Record New Purchase</h3>
         <form onSubmit={handleSubmit}>
           <div style={{ 
             display: 'grid', 

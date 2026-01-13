@@ -92,21 +92,21 @@ export default function Inventory() {
 
   return (
     <div>
-      <h2 style={{ color: '#1e40af', marginBottom: '20px' }}>📦 Inventory Management</h2>
+      <h2 style={{ color: '#1e293b', marginBottom: '20px' }}>📦 Inventory Management</h2>
       
       {/* Items Table */}
       <div style={{ overflowX: 'auto', marginBottom: '30px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: '#f9fafb' }}>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>ID</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Name</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>SKU</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Stock</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Cost</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Sale Price</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Date</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Actions</th>
+            <tr style={{ background: '#1e293b' }}>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>ID</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Name</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>SKU</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Stock</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Cost</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Sale Price</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Date</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -149,7 +149,7 @@ export default function Inventory() {
 
       {/* Add Item Form */}
       <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px' }}>
-        <h3 style={{ color: '#1e40af', marginBottom: '16px' }}>➕ Add New Item</h3>
+        <h3 style={{ color: '#1e293b', marginBottom: '16px' }}>➕ Add New Item</h3>
         <form onSubmit={handleSubmit}>
           <div style={{ 
             display: 'grid', 

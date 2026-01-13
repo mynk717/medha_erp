@@ -116,11 +116,11 @@ export default function Invoices() {
           .header { text-align: center; border-bottom: 3px solid #1e40af; padding-bottom: 20px; margin-bottom: 20px; }
           .header h1 { color: #1e40af; margin: 0; }
           .details { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-          .section { background: #f9fafb; padding: 15px; border-radius: 8px; }
+          .section { background: #1e293b; color: #ffffff; padding: 15px; border-radius: 8px; }
           .section h3 { margin: 0 0 10px 0; color: #1e40af; }
           table { width: 100%; border-collapse: collapse; margin: 20px 0; }
           th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-          th { background: #f9fafb; font-weight: 600; }
+          th { background: #1e293b; color: #ffffff; font-weight: 600; }
           .totals { text-align: right; }
           .totals table { margin-left: auto; width: 300px; }
           .grand-total { font-size: 18px; font-weight: bold; background: #e0f2fe; }
@@ -285,14 +285,14 @@ export default function Invoices() {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <FileText className="w-8 h-8 text-indigo-600" />
-        <h2 style={{ color: '#1e40af', margin: 0 }}>Invoice Management</h2>
+        <h2 style={{ color: '#1e293b', margin: 0 }}>Invoice Management</h2>
       </div>
       
       {sales.length === 0 ? (
         <div style={{ 
           padding: '40px', 
           textAlign: 'center', 
-          background: '#f9fafb', 
+          background: '#1e293b', 
           borderRadius: '12px',
           border: '2px solid #e5e7eb'
         }}>
@@ -303,13 +303,13 @@ export default function Invoices() {
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', background: 'white', borderRadius: '8px' }}>
             <thead>
-              <tr style={{ background: '#f9fafb' }}>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Sale ID</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Date</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Customer</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Item</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Amount</th>
-                <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Actions</th>
+              <tr style={{ background: '#1e293b' }}>
+                <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Sale ID</th>
+                <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Date</th>
+                <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Customer</th>
+                <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Item</th>
+                <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Amount</th>
+                <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Actions</th>
               </tr>
             </thead>
             <tbody>

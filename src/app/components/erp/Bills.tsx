@@ -128,22 +128,22 @@ export default function Bills() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2 style={{ color: '#1e40af', margin: 0 }}>Bills & Payables</h2>
+        <h2 style={{ color: '#1e293b', margin: 0 }}>Bills & Payables</h2>
       </div>
       
       {/* Bills Table */}
       <div style={{ overflowX: 'auto', marginBottom: '30px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr style={{ background: '#f9fafb' }}>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>ID</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Date</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Supplier</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Amount</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Due Date</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Status</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Notes</th>
-              <th style={{ padding: '12px', textAlign: 'left', borderBottom: '2px solid #e5e7eb' }}>Actions</th>
+            <tr style={{ background: '#1e293b' }}>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>ID</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Date</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Supplier</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Amount</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Due Date</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Status</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Notes</th>
+              <th style={{ padding: '12px', textAlign: 'left', color: '#ffffff', fontWeight: 700, borderBottom: '2px solid #cbd5e1' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -265,7 +265,7 @@ export default function Bills() {
 
       {/* Add Bill Form */}
       <div style={{ background: '#f8fafc', padding: '24px', borderRadius: '12px' }}>
-        <h3 style={{ color: '#1e40af', marginBottom: '16px' }}>➕ Record New Bill</h3>
+        <h3 style={{ color: '#1e293b', marginBottom: '16px' }}>➕ Record New Bill</h3>
         <form onSubmit={handleSubmit}>
           <div style={{ 
             display: 'grid', 
@@ -413,7 +413,7 @@ export default function Bills() {
             {/* Bill Preview Content */}
             <div style={{ padding: '40px' }} className="print-content">
               <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                <h1 style={{ color: '#1e40af', margin: '0 0 8px 0' }}>BILL</h1>
+                <h1 style={{ color: '#1e293b', margin: '0 0 8px 0' }}>BILL</h1>
                 <p style={{ color: '#64748b', margin: 0 }}>Medha Sanitary & Hardware</p>
               </div>
 
@@ -423,7 +423,7 @@ export default function Bills() {
                 gap: '24px',
                 marginBottom: '32px',
                 padding: '20px',
-                background: '#f9fafb',
+                background: '#1e293b',
                 borderRadius: '8px'
               }}>
                 <div>
@@ -446,13 +446,13 @@ export default function Bills() {
 
               <div style={{ 
                 padding: '20px',
-                background: '#f9fafb',
+                background: '#1e293b',
                 borderRadius: '8px',
                 marginBottom: '24px'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <p style={{ margin: 0, fontSize: '18px', color: '#64748b' }}>Total Amount</p>
-                  <p style={{ margin: 0, fontSize: '32px', fontWeight: 'bold', color: '#1e40af' }}>
+                  <p style={{ margin: 0, fontSize: '32px', fontWeight: 'bold', color: '#1e293b' }}>
                     {formatCurrency(previewBill.total)}
                   </p>
                 </div>
