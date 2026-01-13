@@ -102,7 +102,8 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
           </div>
@@ -130,7 +131,8 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
           </div>
@@ -158,7 +160,8 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
           </div>
@@ -218,7 +221,8 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <small style={{ color: '#1e293b', fontSize: '12px' }}>e.g., 22 for Chhattisgarh</small>
@@ -247,7 +251,8 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
           </div>

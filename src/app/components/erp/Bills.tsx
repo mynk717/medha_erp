@@ -151,9 +151,9 @@ export default function Bills() {
               const isOverdue = bill.status === 'Pending' && new Date(bill.dueDate) < new Date();
               return (
                 <tr key={bill.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <td style={{ padding: '12px' }}>{bill.id}</td>
-                  <td style={{ padding: '12px' }}>{bill.date}</td>
-                  <td style={{ padding: '12px', fontWeight: '600' }}>{bill.supplier}</td>
+                  <td style={{ padding: '12px', color: '#1e293b' }}>{bill.id}</td>
+                  <td style={{ padding: '12px', color: '#1e293b' }}>{bill.date}</td>
+                  <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{bill.supplier}</td>
                   <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(bill.total)}</td>
                   <td style={{ 
                     padding: '12px',
@@ -161,7 +161,7 @@ export default function Bills() {
                   }}>
                     {bill.dueDate}
                   </td>
-                  <td style={{ padding: '12px' }}>
+                  <td style={{ padding: '12px', color: '#1e293b' }}>
                     <span style={{
                       padding: '4px 12px',
                       borderRadius: '12px',
@@ -178,7 +178,7 @@ export default function Bills() {
                     </span>
                   </td>
                   <td style={{ padding: '12px', fontSize: '12px' }}>{bill.notes}</td>
-                  <td style={{ padding: '12px' }}>
+                  <td style={{ padding: '12px', color: '#1e293b' }}>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       {bill.status === 'Pending' && (
                         <button
@@ -282,7 +282,8 @@ export default function Bills() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -295,7 +296,8 @@ export default function Bills() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -310,7 +312,8 @@ export default function Bills() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -322,7 +325,8 @@ export default function Bills() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input

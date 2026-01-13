@@ -112,9 +112,9 @@ export default function Inventory() {
           <tbody>
             {items.map((item, index) => (
               <tr key={item.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '12px' }}>{item.id}</td>
-                <td style={{ padding: '12px', fontWeight: '600' }}>{item.name}</td>
-                <td style={{ padding: '12px' }}>{item.sku}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{item.id}</td>
+                <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{item.name}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{item.sku}</td>
                 <td style={{ 
                   padding: '12px',
                   color: item.stock < 5 ? '#ef4444' : item.stock < 10 ? '#f59e0b' : '#10b981',
@@ -122,10 +122,10 @@ export default function Inventory() {
                 }}>
                   {item.stock}
                 </td>
-                <td style={{ padding: '12px' }}>{formatCurrency(item.cost)}</td>
-                <td style={{ padding: '12px' }}>{formatCurrency(item.sale)}</td>
-                <td style={{ padding: '12px' }}>{item.date}</td>
-                <td style={{ padding: '12px' }}>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{formatCurrency(item.cost)}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{formatCurrency(item.sale)}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{item.date}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>
                   <button
                     onClick={() => handleDelete(item.id, index)}
                     style={{
@@ -167,7 +167,8 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -180,7 +181,8 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -194,7 +196,8 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -208,7 +211,8 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -222,7 +226,8 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
           </div>

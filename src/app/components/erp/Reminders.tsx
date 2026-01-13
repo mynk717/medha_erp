@@ -370,13 +370,13 @@ export default function Reminders() {
                   );
                   return (
                     <tr key={invoice.id} style={{ borderBottom: '1px solid #fecaca' }}>
-                      <td style={{ padding: '12px' }}>{invoice.id}</td>
-                      <td style={{ padding: '12px', fontWeight: '600' }}>{invoice.customer}</td>
-                      <td style={{ padding: '12px' }}>{invoice.customerPhone}</td>
+                      <td style={{ padding: '12px', color: '#1e293b' }}>{invoice.id}</td>
+                      <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{invoice.customer}</td>
+                      <td style={{ padding: '12px', color: '#1e293b' }}>{invoice.customerPhone}</td>
                       <td style={{ padding: '12px', fontWeight: 'bold' }}>₹{invoice.total.toFixed(2)}</td>
                       <td style={{ padding: '12px', color: '#ef4444' }}>{invoice.dueDate}</td>
                       <td style={{ padding: '12px', color: '#ef4444', fontWeight: 'bold' }}>{daysOverdue} days</td>
-                      <td style={{ padding: '12px' }}>
+                      <td style={{ padding: '12px', color: '#1e293b' }}>
                         <button
                           onClick={() => sendSingleInvoiceReminder(invoice)}
                           disabled={sending || !configured}
@@ -427,11 +427,11 @@ export default function Reminders() {
               <tbody>
                 {dueTodayInvoices.map(invoice => (
                   <tr key={invoice.id} style={{ borderBottom: '1px solid #fde68a' }}>
-                    <td style={{ padding: '12px' }}>{invoice.id}</td>
-                    <td style={{ padding: '12px', fontWeight: '600' }}>{invoice.customer}</td>
-                    <td style={{ padding: '12px' }}>{invoice.customerPhone}</td>
+                    <td style={{ padding: '12px', color: '#1e293b' }}>{invoice.id}</td>
+                    <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{invoice.customer}</td>
+                    <td style={{ padding: '12px', color: '#1e293b' }}>{invoice.customerPhone}</td>
                     <td style={{ padding: '12px', fontWeight: 'bold' }}>₹{invoice.total.toFixed(2)}</td>
-                    <td style={{ padding: '12px' }}>
+                    <td style={{ padding: '12px', color: '#1e293b' }}>
                       <button
                         onClick={() => sendSingleInvoiceReminder(invoice)}
                         disabled={sending || !configured}

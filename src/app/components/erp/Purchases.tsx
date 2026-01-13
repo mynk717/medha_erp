@@ -119,14 +119,14 @@ export default function Purchases() {
           <tbody>
             {purchases.map((purchase) => (
               <tr key={purchase.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '12px' }}>{purchase.id}</td>
-                <td style={{ padding: '12px' }}>{purchase.date}</td>
-                <td style={{ padding: '12px', fontWeight: '600' }}>{purchase.supplier}</td>
-                <td style={{ padding: '12px' }}>{purchase.item}</td>
-                <td style={{ padding: '12px' }}>{purchase.qty}</td>
-                <td style={{ padding: '12px' }}>{formatCurrency(purchase.costPerUnit)}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{purchase.id}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{purchase.date}</td>
+                <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{purchase.supplier}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{purchase.item}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{purchase.qty}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{formatCurrency(purchase.costPerUnit)}</td>
                 <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(purchase.total)}</td>
-                <td style={{ padding: '12px' }}>
+                <td style={{ padding: '12px', color: '#1e293b' }}>
                   <span style={{
                     padding: '4px 12px',
                     borderRadius: '12px',
@@ -163,7 +163,8 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -176,7 +177,8 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <select
@@ -187,7 +189,8 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             >
               <option value="">Select Item *</option>
@@ -208,7 +211,8 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -223,7 +227,8 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
           </div>

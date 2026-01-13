@@ -315,12 +315,12 @@ export default function Invoices() {
             <tbody>
               {sales.map((sale) => (
                 <tr key={sale.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                  <td style={{ padding: '12px' }}>{sale.id}</td>
-                  <td style={{ padding: '12px' }}>{sale.date}</td>
-                  <td style={{ padding: '12px', fontWeight: '600' }}>{sale.customer}</td>
-                  <td style={{ padding: '12px' }}>{sale.item}</td>
+                  <td style={{ padding: '12px', color: '#1e293b' }}>{sale.id}</td>
+                  <td style={{ padding: '12px', color: '#1e293b' }}>{sale.date}</td>
+                  <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{sale.customer}</td>
+                  <td style={{ padding: '12px', color: '#1e293b' }}>{sale.item}</td>
                   <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(sale.total)}</td>
-                  <td style={{ padding: '12px' }}>
+                  <td style={{ padding: '12px', color: '#1e293b' }}>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       <button
                         onClick={() => generateInvoice(sale)}

@@ -150,14 +150,14 @@ export default function Sales() {
           <tbody>
             {sales.map((sale) => (
               <tr key={sale.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
-                <td style={{ padding: '12px' }}>{sale.id}</td>
-                <td style={{ padding: '12px' }}>{sale.date}</td>
-                <td style={{ padding: '12px', fontWeight: '600' }}>{sale.customer}</td>
-                <td style={{ padding: '12px' }}>{sale.item}</td>
-                <td style={{ padding: '12px' }}>{sale.qty}</td>
-                <td style={{ padding: '12px' }}>{formatCurrency(sale.salePerUnit)}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{sale.id}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{sale.date}</td>
+                <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{sale.customer}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{sale.item}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{sale.qty}</td>
+                <td style={{ padding: '12px', color: '#1e293b' }}>{formatCurrency(sale.salePerUnit)}</td>
                 <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(sale.total)}</td>
-                <td style={{ padding: '12px' }}>
+                <td style={{ padding: '12px', color: '#1e293b' }}>
                   <span style={{
                     padding: '4px 12px',
                     borderRadius: '12px',
@@ -169,7 +169,7 @@ export default function Sales() {
                     {sale.status}
                   </span>
                 </td>
-                <td style={{ padding: '12px' }}>
+                <td style={{ padding: '12px', color: '#1e293b' }}>
                   <button
                     onClick={() => sendReminder(sale)}
                     style={{
@@ -210,7 +210,8 @@ export default function Sales() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -223,7 +224,8 @@ export default function Sales() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -235,7 +237,8 @@ export default function Sales() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <select
@@ -246,7 +249,8 @@ export default function Sales() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             >
               <option value="">Select Item *</option>
@@ -267,7 +271,8 @@ export default function Sales() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
             <input
@@ -282,7 +287,8 @@ export default function Sales() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px'
+                fontSize: '16px',
+              color: '#1e293b'
               }}
             />
           </div>
