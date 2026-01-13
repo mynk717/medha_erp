@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Plus, Trash2, Edit2, X } from 'lucide-react';
+import { FolderOpen, Plus, Trash2, Edit2, X, Check, FileSpreadsheet } from 'lucide-react';
 
 interface Sheet {
   id: string;
