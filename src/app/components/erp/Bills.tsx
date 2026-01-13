@@ -521,10 +521,10 @@ export default function Bills() {
                 boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <p style={{ margin: 0, fontSize: '18px', color: '#ffffff', fontWeight: '500' }}>
+                  <p style={{ margin: 0, fontSize: '18px', color: '#1e293b', fontWeight: '500' }}>
                     Total Amount
                   </p>
-                  <p style={{ margin: 0, fontSize: '36px', fontWeight: 'bold', color: '#ffffff' }}>
+                  <p style={{ margin: 0, fontSize: '36px', fontWeight: 'bold', color: '#1e293b' }}>
                     {formatCurrency(previewBill.total)}
                   </p>
                 </div>

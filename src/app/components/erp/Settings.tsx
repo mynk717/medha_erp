@@ -2,11 +2,22 @@
 
 import React, { useState, useEffect } from 'react';
 import { BusinessSettings } from '@/types/erp';
-import { Save, Building2, Phone, MapPin, FileText, Globe, Calculator } from 'lucide-react';
+import { 
+  Save, 
+  Building2, 
+  Phone, 
+  MapPin, 
+  FileText, 
+  Globe, 
+  Calculator,
+  Upload,
+  X,
+  Image as ImageIcon
+} from 'lucide-react';
 
 export default function Settings() {
-  const [settings, setSettings] = useState<BusinessSettings>({
-    name: '',
+  const [settings, setSettings] = useState<any>({
+    businessName: '',
     gstNumber: '',
     phone: '',
     address: '',
@@ -14,10 +25,16 @@ export default function Settings() {
     logo: '',
     invoiceTerms: '',
     gstEnabled: true,
-    defaultGstRate: 18
+    defaultGstRate: 18,
+    email: '',
+    bankName: '',
+    accountNumber: '',
+    ifsc: '',
+    upiId: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -32,12 +49,76 @@ export default function Settings() {
       }
       
       const data = await response.json();
-      setSettings(data.settings);
+      
+      // Map API data to state
+      setSettings({
+        businessName: data.settings.businessName || '',
+        gstNumber: data.settings.gstNumber || '',
+        phone: data.settings.phone || '',
+        address: data.settings.address || '',
+        stateCode: data.settings.stateCode || '',
+        logo: data.settings.logo || '',
+        invoiceTerms: data.settings.invoiceTerms || '',
+        gstEnabled: data.settings.gstEnabled ?? true,
+        defaultGstRate: data.settings.defaultGstRate || 18,
+        email: data.settings.email || '',
+        bankName: data.settings.bankName || '',
+        accountNumber: data.settings.accountNumber || '',
+        ifsc: data.settings.ifsc || '',
+        upiId: data.settings.upiId || ''
+      });
+      
       setLoading(false);
     } catch (error) {
       console.error('Error loading settings:', error);
       setLoading(false);
       alert('Failed to load settings');
+    }
+  };
+
+  // ✅ NEW: Handle logo upload
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file (PNG, JPG, or SVG)');
+      return;
+    }
+
+    // Validate file size (2MB limit)
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Image size must be less than 2MB');
+      return;
+    }
+
+    setUploadingLogo(true);
+
+    try {
+      // Convert to base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      // Update settings with base64 image
+      setSettings({ ...settings, logo: base64 });
+      alert('✅ Logo uploaded! Click "Save Settings" to apply changes.');
+    } catch (error) {
+      console.error('Error uploading logo:', error);
+      alert('❌ Failed to upload logo');
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
+  // ✅ NEW: Remove logo
+  const handleRemoveLogo = () => {
+    if (confirm('Remove business logo?')) {
+      setSettings({ ...settings, logo: '' });
     }
   };
 
@@ -56,10 +137,10 @@ export default function Settings() {
         throw new Error('Failed to save settings');
       }
       
-      alert('Settings saved successfully!');
+      alert('✅ Settings saved successfully!');
     } catch (error) {
       console.error('Error saving settings:', error);
-      alert('Failed to save settings');
+      alert('❌ Failed to save settings');
     } finally {
       setSaving(false);
     }
@@ -115,8 +196,8 @@ export default function Settings() {
             </label>
             <input
               type="text"
-              value={settings.name}
-              onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+              value={settings.businessName}
+              onChange={(e) => setSettings({ ...settings, businessName: e.target.value })}
               placeholder="Medha Sanitary & Hardware"
               required
               style={{
@@ -129,6 +210,117 @@ export default function Settings() {
                 backgroundColor: '#ffffff'
               }}
             />
+          </div>
+
+          {/* ✅ NEW: Logo Upload Section */}
+          <div style={{ gridColumn: '1 / -1' }}>
+            <label style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px',
+              fontWeight: '600', 
+              marginBottom: '8px',
+              color: '#1e293b',
+              fontSize: '14px'
+            }}>
+              <ImageIcon className="w-4 h-4" />
+              Business Logo
+            </label>
+            
+            {/* Logo Preview */}
+            {settings.logo && (
+              <div style={{ 
+                marginBottom: '12px', 
+                padding: '16px', 
+                background: '#f8fafc', 
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                border: '2px solid #e2e8f0'
+              }}>
+                <img 
+                  src={settings.logo} 
+                  alt="Business Logo" 
+                  style={{ 
+                    maxHeight: '80px', 
+                    maxWidth: '200px',
+                    objectFit: 'contain',
+                    borderRadius: '4px'
+                  }} 
+                />
+                <button
+                  type="button"
+                  onClick={handleRemoveLogo}
+                  style={{
+                    background: '#ef4444',
+                    color: 'white',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '14px',
+                    fontWeight: '600'
+                  }}
+                >
+                  <X className="w-4 h-4" />
+                  Remove
+                </button>
+              </div>
+            )}
+
+            {/* Upload Button */}
+            <div style={{ position: 'relative' }}>
+              <input
+                type="file"
+                id="logo-upload"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                style={{ display: 'none' }}
+                disabled={uploadingLogo}
+              />
+              <label
+                htmlFor="logo-upload"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px 24px',
+                  background: uploadingLogo ? '#94a3b8' : '#6366f1',
+                  color: 'white',
+                  borderRadius: '8px',
+                  cursor: uploadingLogo ? 'not-allowed' : 'pointer',
+                  fontWeight: '600',
+                  fontSize: '14px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {uploadingLogo ? (
+                  <>
+                    <div style={{
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid white',
+                      borderTop: '2px solid transparent',
+                      borderRadius: '50%',
+                      animation: 'spin 1s linear infinite'
+                    }}></div>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    {settings.logo ? 'Change Logo' : 'Upload Logo'}
+                  </>
+                )}
+              </label>
+            </div>
+            <small style={{ display: 'block', marginTop: '8px', color: '#64748b', fontSize: '12px' }}>
+              Recommended: 200x200px • Max 2MB • PNG, JPG, or SVG
+            </small>
           </div>
 
           {/* GST Number */}
@@ -267,7 +459,7 @@ export default function Settings() {
             </small>
           </div>
 
-          {/* Logo URL */}
+          {/* Logo URL (kept for backward compatibility) */}
           <div>
             <label style={{ 
               display: 'flex', 
@@ -279,13 +471,14 @@ export default function Settings() {
               fontSize: '14px'
             }}>
               <Globe className="w-4 h-4" />
-              Logo URL (optional)
+              Or Enter Logo URL (optional)
             </label>
             <input
               type="url"
-              value={settings.logo}
+              value={settings.logo && !settings.logo.startsWith('data:') ? settings.logo : ''}
               onChange={(e) => setSettings({ ...settings, logo: e.target.value })}
               placeholder="https://example.com/logo.png"
+              disabled={settings.logo && settings.logo.startsWith('data:')}
               style={{
                 width: '100%',
                 padding: '14px',
@@ -293,9 +486,13 @@ export default function Settings() {
                 borderRadius: '8px',
                 fontSize: '16px',
                 color: '#1e293b',
-                backgroundColor: '#ffffff'
+                backgroundColor: settings.logo && settings.logo.startsWith('data:') ? '#f1f5f9' : '#ffffff',
+                cursor: settings.logo && settings.logo.startsWith('data:') ? 'not-allowed' : 'text'
               }}
             />
+            <small style={{ display: 'block', marginTop: '4px', color: '#64748b', fontSize: '12px' }}>
+              {settings.logo && settings.logo.startsWith('data:') ? 'Using uploaded logo. Remove it to use URL instead.' : 'Alternative to uploading a logo file'}
+            </small>
           </div>
 
           {/* GST Settings */}
@@ -445,6 +642,14 @@ export default function Settings() {
           {saving ? 'Saving...' : 'Save Settings'}
         </button>
       </form>
+
+      {/* ✅ Add spinning animation for upload indicator */}
+      <style jsx>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
