@@ -319,7 +319,7 @@ export default function Invoices() {
                   <td style={{ padding: '12px', color: '#1e293b' }}>{sale.date}</td>
                   <td style={{ padding: '12px', fontWeight: '600', color: '#1e293b' }}>{sale.customer}</td>
                   <td style={{ padding: '12px', color: '#1e293b' }}>{sale.item}</td>
-                  <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(sale.total)}</td>
+                  <td style={{ padding: '12px', color: '#1e293b',fontWeight: 'bold' }}>{formatCurrency(sale.total)}</td>
                   <td style={{ padding: '12px', color: '#1e293b' }}>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       <button

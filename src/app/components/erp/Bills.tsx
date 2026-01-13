@@ -177,7 +177,7 @@ export default function Bills() {
                       {isOverdue && bill.status === 'Pending' ? 'Overdue' : bill.status}
                     </span>
                   </td>
-                  <td style={{ padding: '12px', fontSize: '12px' }}>{bill.notes}</td>
+                  <td style={{ padding: '12px', color: '#1e293b',fontSize: '12px' }}>{bill.notes}</td>
                   <td style={{ padding: '12px', color: '#1e293b' }}>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       {bill.status === 'Pending' && (

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { BusinessSettings } from '@/types/erp';
-import { GoogleSheetsService } from '@/lib/googleSheets';
 import { Save, Building2, Phone, MapPin, FileText, Globe, Calculator } from 'lucide-react';
 
 export default function Settings() {
@@ -24,51 +23,73 @@ export default function Settings() {
     loadSettings();
   }, []);
 
-  // Remove Google Sheets logic, use API instead
-const loadSettings = async () => {
-  try {
-    const response = await fetch('/api/settings');
-    
-    if (!response.ok) {
-      throw new Error('Failed to load settings');
+  const loadSettings = async () => {
+    try {
+      const response = await fetch('/api/settings');
+      
+      if (!response.ok) {
+        throw new Error('Failed to load settings');
+      }
+      
+      const data = await response.json();
+      setSettings(data.settings);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading settings:', error);
+      setLoading(false);
+      alert('Failed to load settings');
     }
-    
-    const data = await response.json();
-    setSettings(data.settings);
-  } catch (error) {
-    console.error('Error loading settings:', error);
-    alert('Failed to load settings');
-  }
-};
+  };
 
-const handleSave = async () => {
-  try {
-    const response = await fetch('/api/settings', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(settings)
-    });
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
     
-    if (!response.ok) {
-      throw new Error('Failed to save settings');
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save settings');
+      }
+      
+      alert('Settings saved successfully!');
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('Failed to save settings');
+    } finally {
+      setSaving(false);
     }
-    
-    alert('✅ Settings saved successfully!');
-  } catch (error) {
-    console.error('Error saving settings:', error);
-    alert('❌ Failed to save settings');
-  }
-};
+  };
 
   if (loading) {
-    return <div style={{ padding: '40px', textAlign: 'center' }}>Loading settings...</div>;
+    return (
+      <div style={{ 
+        padding: '40px', 
+        textAlign: 'center', 
+        color: '#1e293b', 
+        fontSize: '16px' 
+      }}>
+        Loading settings...
+      </div>
+    );
   }
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-        <Building2 className="w-8 h-8 text-indigo-600" />
-        <h2 style={{ color: '#1e293b', margin: 0 }}>Business Settings</h2>
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '12px', 
+        marginBottom: '24px' 
+      }}>
+        <Building2 className="w-8 h-8" style={{ color: '#6366f1' }} />
+        <h2 style={{ color: '#1e293b', margin: 0, fontSize: '24px', fontWeight: '700' }}>
+          Business Settings
+        </h2>
       </div>
       
       <form onSubmit={handleSave}>
@@ -86,7 +107,8 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e293b'
+              color: '#1e293b',
+              fontSize: '14px'
             }}>
               <Building2 className="w-4 h-4" />
               Business Name *
@@ -103,7 +125,8 @@ const handleSave = async () => {
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
                 fontSize: '16px',
-              color: '#1e293b'
+                color: '#1e293b',
+                backgroundColor: '#ffffff'
               }}
             />
           </div>
@@ -116,7 +139,8 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e293b'
+              color: '#1e293b',
+              fontSize: '14px'
             }}>
               <FileText className="w-4 h-4" />
               GST Number
@@ -132,7 +156,8 @@ const handleSave = async () => {
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
                 fontSize: '16px',
-              color: '#1e293b'
+                color: '#1e293b',
+                backgroundColor: '#ffffff'
               }}
             />
           </div>
@@ -145,7 +170,8 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e293b'
+              color: '#1e293b',
+              fontSize: '14px'
             }}>
               <Phone className="w-4 h-4" />
               Phone
@@ -161,7 +187,8 @@ const handleSave = async () => {
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
                 fontSize: '16px',
-              color: '#1e293b'
+                color: '#1e293b',
+                backgroundColor: '#ffffff'
               }}
             />
           </div>
@@ -174,7 +201,8 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e293b'
+              color: '#1e293b',
+              fontSize: '14px'
             }}>
               <MapPin className="w-4 h-4" />
               Address *
@@ -192,7 +220,9 @@ const handleSave = async () => {
                 borderRadius: '8px',
                 fontSize: '16px',
                 resize: 'vertical',
-                fontFamily: 'inherit'
+                fontFamily: 'inherit',
+                color: '#1e293b',
+                backgroundColor: '#ffffff'
               }}
             />
           </div>
@@ -205,7 +235,8 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e293b'
+              color: '#1e293b',
+              fontSize: '14px'
             }}>
               <MapPin className="w-4 h-4" />
               State Code (for GST)
@@ -222,10 +253,18 @@ const handleSave = async () => {
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
                 fontSize: '16px',
-              color: '#1e293b'
+                color: '#1e293b',
+                backgroundColor: '#ffffff'
               }}
             />
-            <small style={{ color: '#1e293b', fontSize: '12px' }}>e.g., 22 for Chhattisgarh</small>
+            <small style={{ 
+              color: '#64748b', 
+              fontSize: '12px', 
+              marginTop: '4px', 
+              display: 'block' 
+            }}>
+              e.g., 22 for Chhattisgarh
+            </small>
           </div>
 
           {/* Logo URL */}
@@ -236,7 +275,8 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e293b'
+              color: '#1e293b',
+              fontSize: '14px'
             }}>
               <Globe className="w-4 h-4" />
               Logo URL (optional)
@@ -252,7 +292,8 @@ const handleSave = async () => {
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
                 fontSize: '16px',
-              color: '#1e293b'
+                color: '#1e293b',
+                backgroundColor: '#ffffff'
               }}
             />
           </div>
@@ -270,13 +311,20 @@ const handleSave = async () => {
               margin: '0 0 16px 0',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              fontSize: '18px',
+              fontWeight: '600'
             }}>
-              <Calculator className="w-5 h-5" />
+              <Calculator className="w-5 h-5" style={{ color: '#3b82f6' }} />
               GST Configuration
             </h3>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px', 
+              marginBottom: '16px' 
+            }}>
               <input
                 type="checkbox"
                 id="gstEnabled"
@@ -284,14 +332,28 @@ const handleSave = async () => {
                 onChange={(e) => setSettings({ ...settings, gstEnabled: e.target.checked })}
                 style={{ width: '20px', height: '20px', cursor: 'pointer' }}
               />
-              <label htmlFor="gstEnabled" style={{ cursor: 'pointer', fontWeight: '600' }}>
+              <label 
+                htmlFor="gstEnabled" 
+                style={{ 
+                  cursor: 'pointer', 
+                  fontWeight: '600', 
+                  color: '#1e293b',
+                  fontSize: '14px' 
+                }}
+              >
                 Enable GST Calculations
               </label>
             </div>
 
             {settings.gstEnabled && (
               <div>
-                <label style={{ fontWeight: '600', marginBottom: '8px', display: 'block' }}>
+                <label style={{ 
+                  fontWeight: '600', 
+                  marginBottom: '8px', 
+                  display: 'block',
+                  color: '#1e293b',
+                  fontSize: '14px'
+                }}>
                   Default GST Rate (%)
                 </label>
                 <select
@@ -302,7 +364,10 @@ const handleSave = async () => {
                     border: '2px solid #cbd5e1',
                     borderRadius: '8px',
                     fontSize: '16px',
-                    width: '200px'
+                    width: '200px',
+                    color: '#1e293b',
+                    backgroundColor: '#ffffff',
+                    cursor: 'pointer'
                   }}
                 >
                   <option value="0">0% (Exempt)</option>
@@ -311,7 +376,12 @@ const handleSave = async () => {
                   <option value="18">18%</option>
                   <option value="28">28%</option>
                 </select>
-                <p style={{ fontSize: '12px', marginTop: '8px' }}>
+                <p style={{ 
+                  fontSize: '12px', 
+                  marginTop: '8px', 
+                  color: '#475569',
+                  lineHeight: '1.6' 
+                }}>
                   For intra-state: CGST ({settings.defaultGstRate / 2}%) + SGST ({settings.defaultGstRate / 2}%)<br />
                   For inter-state: IGST ({settings.defaultGstRate}%)
                 </p>
@@ -327,7 +397,8 @@ const handleSave = async () => {
               gap: '8px',
               fontWeight: '600', 
               marginBottom: '8px',
-              color: '#1e293b'
+              color: '#1e293b',
+              fontSize: '14px'
             }}>
               <FileText className="w-4 h-4" />
               Invoice Terms & Conditions
@@ -344,7 +415,9 @@ const handleSave = async () => {
                 borderRadius: '8px',
                 fontSize: '16px',
                 resize: 'vertical',
-                fontFamily: 'inherit'
+                fontFamily: 'inherit',
+                color: '#1e293b',
+                backgroundColor: '#ffffff'
               }}
             />
           </div>
@@ -355,7 +428,7 @@ const handleSave = async () => {
           disabled={saving}
           style={{
             background: saving ? '#94a3b8' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
+            color: '#ffffff',
             padding: '16px 40px',
             borderRadius: '8px',
             border: 'none',

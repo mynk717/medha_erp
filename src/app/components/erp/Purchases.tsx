@@ -125,7 +125,7 @@ export default function Purchases() {
                 <td style={{ padding: '12px', color: '#1e293b' }}>{purchase.item}</td>
                 <td style={{ padding: '12px', color: '#1e293b' }}>{purchase.qty}</td>
                 <td style={{ padding: '12px', color: '#1e293b' }}>{formatCurrency(purchase.costPerUnit)}</td>
-                <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(purchase.total)}</td>
+                <td style={{ padding: '12px', color: '#1e293b',fontWeight: 'bold' }}>{formatCurrency(purchase.total)}</td>
                 <td style={{ padding: '12px', color: '#1e293b' }}>
                   <span style={{
                     padding: '4px 12px',

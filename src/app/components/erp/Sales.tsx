@@ -156,7 +156,7 @@ export default function Sales() {
                 <td style={{ padding: '12px', color: '#1e293b' }}>{sale.item}</td>
                 <td style={{ padding: '12px', color: '#1e293b' }}>{sale.qty}</td>
                 <td style={{ padding: '12px', color: '#1e293b' }}>{formatCurrency(sale.salePerUnit)}</td>
-                <td style={{ padding: '12px', fontWeight: 'bold' }}>{formatCurrency(sale.total)}</td>
+                <td style={{ padding: '12px', color: '#1e293b',fontWeight: 'bold' }}>{formatCurrency(sale.total)}</td>
                 <td style={{ padding: '12px', color: '#1e293b' }}>
                   <span style={{
                     padding: '4px 12px',
