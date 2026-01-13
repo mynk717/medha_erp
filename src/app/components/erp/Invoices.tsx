@@ -110,143 +110,314 @@ export default function Invoices() {
   const showInvoicePreview = (invoice: Invoice) => {
     const previewWindow = window.open('', '_blank', 'width=800,height=600');
     if (!previewWindow) return;
-
+  
+    // Generate WhatsApp link using wa.me
+    const generateWhatsAppLink = () => {
+      if (!invoice.customerPhone) return '';
+      
+      // Clean phone number (remove spaces, dashes, etc.)
+      const cleanPhone = invoice.customerPhone.replace(/\D/g, '');
+      
+      // Add country code if not present (assuming India +91)
+      const phoneWithCountry = cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone;
+      
+      // Create message
+      const message = `Hello ${invoice.customer}! 👋
+  
+  Here's your invoice from *${businessSettings?.name || 'Our Business'}*
+  
+  📄 *Invoice #${invoice.id}*
+  📅 Date: ${invoice.date}
+  💰 Total Amount: ${formatCurrency(invoice.total)}
+  
+  *Items:*
+  ${invoice.items.map(item => `• ${item.name} - Qty: ${item.qty} @ ${formatCurrency(item.rate)}`).join('\n')}
+  
+  *Payment Details:*
+  Subtotal: ${formatCurrency(invoice.subtotal)}
+  ${invoice.cgst > 0 ? `CGST (9%): ${formatCurrency(invoice.cgst)}\nSGST (9%): ${formatCurrency(invoice.sgst)}` : ''}
+  ${invoice.igst > 0 ? `IGST (18%): ${formatCurrency(invoice.igst)}` : ''}
+  *Grand Total: ${formatCurrency(invoice.total)}*
+  
+  📅 Due Date: ${invoice.dueDate}
+  
+  ${businessSettings?.invoiceTerms ? '\n*Terms & Conditions:*\n' + businessSettings.invoiceTerms : ''}
+  
+  Thank you for your business! 🙏`;
+  
+      return `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(message)}`;
+    };
+  
+    const whatsappLink = generateWhatsAppLink();
+  
     const html = `
       <!DOCTYPE html>
       <html>
       <head>
         <title>Invoice ${invoice.id}</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
-          .header { text-align: center; border-bottom: 3px solid #1e40af; padding-bottom: 20px; margin-bottom: 20px; }
-          .header h1 { color: #1e40af; margin: 0; }
-          .details { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
-          .section { background: #1e293b; color: #ffffff; padding: 15px; border-radius: 8px; }
-          .section h3 { margin: 0 0 10px 0; color: #1e40af; }
-          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-          th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-          th { background: #1e293b; color: #ffffff; font-weight: 600; }
+          body { 
+            font-family: Arial, sans-serif; 
+            padding: 40px; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: #f8fafc;
+          }
+          .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+          }
+          .header { 
+            text-align: center; 
+            border-bottom: 3px solid #6366f1; 
+            padding-bottom: 20px; 
+            margin-bottom: 30px; 
+          }
+          .header h1 { color: #1e293b; margin: 0 0 8px 0; }
+          .header p { color: #64748b; margin: 4px 0; }
+          .invoice-title {
+            color: #6366f1;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+          }
+          .details { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+            margin-bottom: 30px; 
+          }
+          .section { 
+            background: #f8fafc; 
+            color: #1e293b; 
+            padding: 20px; 
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+          }
+          .section h3 { 
+            margin: 0 0 12px 0; 
+            color: #6366f1;
+            font-size: 16px;
+            font-weight: 600;
+          }
+          .section p {
+            margin: 6px 0;
+            color: #475569;
+          }
+          table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+          }
+          th, td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #e5e7eb; 
+          }
+          th { 
+            background: #1e293b; 
+            color: #ffffff; 
+            font-weight: 600; 
+          }
+          tbody td {
+            color: #1e293b;
+          }
           .totals { text-align: right; }
-          .totals table { margin-left: auto; width: 300px; }
-          .grand-total { font-size: 18px; font-weight: bold; background: #e0f2fe; }
-          .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #64748b; }
-          .terms { margin-top: 30px; font-size: 12px; color: #64748b; }
-          .btn { padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; margin: 10px; font-weight: 600; }
+          .totals table { 
+            margin-left: auto; 
+            width: 350px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+          }
+          .totals td {
+            padding: 10px 16px;
+            color: #475569;
+          }
+          .grand-total { 
+            font-size: 18px; 
+            font-weight: bold; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+          }
+          .grand-total td {
+            color: white !important;
+          }
+          .footer { 
+            margin-top: 40px; 
+            padding-top: 20px; 
+            border-top: 2px solid #e5e7eb; 
+            text-align: center; 
+            color: #64748b; 
+          }
+          .terms { 
+            margin-top: 30px; 
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #6366f1;
+          }
+          .terms h4 {
+            color: #1e293b;
+            margin: 0 0 12px 0;
+          }
+          .terms p {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.6;
+          }
+          .btn { 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            margin: 10px 5px; 
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+          }
+          .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+          }
+          .btn-whatsapp { background: #25D366; color: white; }
           .btn-print { background: #3b82f6; color: white; }
           .btn-close { background: #64748b; color: white; }
-          @media print { button { display: none; } }
+          @media print { 
+            button { display: none; }
+            body { background: white; }
+            .container { box-shadow: none; }
+          }
         </style>
       </head>
       <body>
-        <div class="header">
-          <h1>${businessSettings?.name || 'Business Name'}</h1>
-          <p>${businessSettings?.address || 'Address'}</p>
-          <p>GST: ${businessSettings?.gstNumber || 'N/A'} | Phone: ${businessSettings?.phone || 'N/A'}</p>
-        </div>
-
-        <h2 style="color: #1e40af;">TAX INVOICE</h2>
-
-        <div class="details">
-          <div class="section">
-            <h3>Bill To:</h3>
-            <p><strong>${invoice.customer}</strong></p>
-            <p>${invoice.customerPhone}</p>
+        <div class="container">
+          <div class="header">
+            ${businessSettings?.logo ? `<img src="${businessSettings.logo}" alt="Logo" style="max-height: 80px; margin-bottom: 12px;">` : ''}
+            <h1>${businessSettings?.name || 'Business Name'}</h1>
+            <p>${businessSettings?.address || 'Address'}</p>
+            <p>GST: ${businessSettings?.gstNumber || 'N/A'} | Phone: ${businessSettings?.phone || 'N/A'}</p>
           </div>
-          <div class="section">
-            <h3>Invoice Details:</h3>
-            <p><strong>Invoice #:</strong> ${invoice.id}</p>
-            <p><strong>Date:</strong> ${invoice.date}</p>
-            <p><strong>Due Date:</strong> ${invoice.dueDate}</p>
+  
+          <div class="invoice-title">TAX INVOICE</div>
+  
+          <div class="details">
+            <div class="section">
+              <h3>Bill To:</h3>
+              <p><strong>${invoice.customer}</strong></p>
+              <p>Phone: ${invoice.customerPhone || 'N/A'}</p>
+            </div>
+            <div class="section">
+              <h3>Invoice Details:</h3>
+              <p><strong>Invoice #:</strong> ${invoice.id}</p>
+              <p><strong>Date:</strong> ${invoice.date}</p>
+              <p><strong>Due Date:</strong> ${invoice.dueDate}</p>
+            </div>
           </div>
-        </div>
-
-        <table>
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Qty</th>
-              <th>Rate</th>
-              <th>Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${invoice.items.map(item => `
-              <tr>
-                <td>${item.name}</td>
-                <td>${item.qty}</td>
-                <td>${formatCurrency(item.rate)}</td>
-                <td>${formatCurrency(item.amount)}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-
-        <div class="totals">
+  
           <table>
-            <tr>
-              <td>Subtotal:</td>
-              <td><strong>${formatCurrency(invoice.subtotal)}</strong></td>
-            </tr>
-            ${invoice.cgst > 0 ? `
+            <thead>
               <tr>
-                <td>CGST (9%):</td>
-                <td>${formatCurrency(invoice.cgst)}</td>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Amount</th>
               </tr>
-              <tr>
-                <td>SGST (9%):</td>
-                <td>${formatCurrency(invoice.sgst)}</td>
-              </tr>
-            ` : ''}
-            ${invoice.igst > 0 ? `
-              <tr>
-                <td>IGST (18%):</td>
-                <td>${formatCurrency(invoice.igst)}</td>
-              </tr>
-            ` : ''}
-            <tr>
-              <td>Round Off:</td>
-              <td>${formatCurrency(invoice.roundOff)}</td>
-            </tr>
-            <tr class="grand-total">
-              <td>Grand Total:</td>
-              <td><strong>${formatCurrency(invoice.total)}</strong></td>
-            </tr>
+            </thead>
+            <tbody>
+              ${invoice.items.map(item => `
+                <tr>
+                  <td>${item.name}</td>
+                  <td>${item.qty}</td>
+                  <td>${formatCurrency(item.rate)}</td>
+                  <td>${formatCurrency(item.amount)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
           </table>
-        </div>
-
-        <div class="terms">
-          <h4>Terms & Conditions:</h4>
-          <p>${businessSettings?.invoiceTerms?.replace(/\n/g, '<br>') || 'Standard terms apply.'}</p>
-        </div>
-
-        <div class="footer">
-          <p>Thank you for your business!</p>
-          <button onclick="window.print()" class="btn btn-print">
-            Print Invoice
-          </button>
-          <button onclick="window.close()" class="btn btn-close">
-            Close
-          </button>
+  
+          <div class="totals">
+            <table>
+              <tr>
+                <td>Subtotal:</td>
+                <td><strong>${formatCurrency(invoice.subtotal)}</strong></td>
+              </tr>
+              ${invoice.cgst > 0 ? `
+                <tr>
+                  <td>CGST (9%):</td>
+                  <td>${formatCurrency(invoice.cgst)}</td>
+                </tr>
+                <tr>
+                  <td>SGST (9%):</td>
+                  <td>${formatCurrency(invoice.sgst)}</td>
+                </tr>
+              ` : ''}
+              ${invoice.igst > 0 ? `
+                <tr>
+                  <td>IGST (18%):</td>
+                  <td>${formatCurrency(invoice.igst)}</td>
+                </tr>
+              ` : ''}
+              <tr>
+                <td>Round Off:</td>
+                <td>${formatCurrency(invoice.roundOff)}</td>
+              </tr>
+              <tr class="grand-total">
+                <td>Grand Total:</td>
+                <td><strong>${formatCurrency(invoice.total)}</strong></td>
+              </tr>
+            </table>
+          </div>
+  
+          ${businessSettings?.invoiceTerms ? `
+            <div class="terms">
+              <h4>Terms & Conditions:</h4>
+              <p>${businessSettings.invoiceTerms.replace(/\n/g, '<br>')}</p>
+            </div>
+          ` : ''}
+  
+          <div class="footer">
+            <p style="font-size: 16px; font-weight: 600; color: #1e293b;">Thank you for your business!</p>
+            <p style="font-size: 12px; margin-top: 8px;">Generated by Medha ERP System</p>
+            
+            <div style="margin-top: 20px;">
+              ${whatsappLink ? `
+                <button onclick="window.open('${whatsappLink}', '_blank')" class="btn btn-whatsapp">
+                  📱 Send via WhatsApp
+                </button>
+              ` : ''}
+              <button onclick="window.print()" class="btn btn-print">
+                🖨️ Print Invoice
+              </button>
+              <button onclick="window.close()" class="btn btn-close">
+                ✖️ Close
+              </button>
+            </div>
+          </div>
         </div>
       </body>
       </html>
     `;
-
+  
     previewWindow.document.write(html);
     previewWindow.document.close();
   };
+  
 
   const sendInvoiceViaWhatsApp = (sale: Sale) => {
     if (!sale.customerPhone) {
       alert('Customer phone number not available!');
       return;
     }
-
+  
     if (!businessSettings) {
       alert('Please configure business settings first!');
       return;
     }
-
+  
     const gstCalc = calculateGST(sale.total / 1.18, 'intra');
     
     const invoice: Invoice = {
@@ -271,11 +442,40 @@ export default function Invoices() {
       dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       gstRate: businessSettings.defaultGstRate
     };
-
-    const whatsapp = WhatsAppHelper.getInstance();
-    const waLink = whatsapp.generateInvoiceWhatsAppLink(invoice, businessSettings.name);
+  
+    // Clean phone number
+    const cleanPhone = sale.customerPhone.replace(/\D/g, '');
+    const phoneWithCountry = cleanPhone.startsWith('91') ? cleanPhone : '91' + cleanPhone;
+    
+    // Create message
+    const message = `Hello ${invoice.customer}! 👋
+  
+  Here's your invoice from *${businessSettings.name}*
+  
+  📄 *Invoice #${invoice.id}*
+  📅 Date: ${invoice.date}
+  💰 Total Amount: ${formatCurrency(invoice.total)}
+  
+  *Items:*
+  ${invoice.items.map(item => `• ${item.name} - Qty: ${item.qty} @ ${formatCurrency(item.rate)}`).join('\n')}
+  
+  *Payment Details:*
+  Subtotal: ${formatCurrency(invoice.subtotal)}
+  ${invoice.cgst > 0 ? `CGST (9%): ${formatCurrency(invoice.cgst)}\nSGST (9%): ${formatCurrency(invoice.sgst)}` : ''}
+  ${invoice.igst > 0 ? `IGST (18%): ${formatCurrency(invoice.igst)}` : ''}
+  *Grand Total: ${formatCurrency(invoice.total)}*
+  
+  📅 Due Date: ${invoice.dueDate}
+  
+  ${businessSettings.invoiceTerms ? '\n*Terms & Conditions:*\n' + businessSettings.invoiceTerms : ''}
+  
+  Thank you for your business! 🙏`;
+  
+    // Open WhatsApp with wa.me link
+    const waLink = `https://wa.me/${phoneWithCountry}?text=${encodeURIComponent(message)}`;
     window.open(waLink, '_blank');
   };
+  
 
   if (loading) {
     return (
