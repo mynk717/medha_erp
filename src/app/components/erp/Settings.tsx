@@ -102,7 +102,7 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
           </div>
@@ -130,7 +130,7 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
           </div>
@@ -158,7 +158,7 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
           </div>
@@ -187,7 +187,7 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b',
+                fontSize: '16px',
                 resize: 'vertical',
                 fontFamily: 'inherit'
               }}
@@ -218,7 +218,7 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <small style={{ color: '#1e293b', fontSize: '12px' }}>e.g., 22 for Chhattisgarh</small>
@@ -247,7 +247,7 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
           </div>
@@ -296,7 +296,7 @@ const handleSave = async () => {
                     padding: '14px',
                     border: '2px solid #cbd5e1',
                     borderRadius: '8px',
-                    fontSize: '16px', color: '#1e293b',
+                    fontSize: '16px',
                     width: '200px'
                   }}
                 >
@@ -306,7 +306,7 @@ const handleSave = async () => {
                   <option value="18">18%</option>
                   <option value="28">28%</option>
                 </select>
-                <p style={{ fontSize: '12px', color: '#1e293b', marginTop: '8px' }}>
+                <p style={{ fontSize: '12px', marginTop: '8px' }}>
                   For intra-state: CGST ({settings.defaultGstRate / 2}%) + SGST ({settings.defaultGstRate / 2}%)<br />
                   For inter-state: IGST ({settings.defaultGstRate}%)
                 </p>
@@ -337,7 +337,7 @@ const handleSave = async () => {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b',
+                fontSize: '16px',
                 resize: 'vertical',
                 fontFamily: 'inherit'
               }}

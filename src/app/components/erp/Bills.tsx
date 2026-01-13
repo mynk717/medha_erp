@@ -177,7 +177,7 @@ export default function Bills() {
                       {isOverdue && bill.status === 'Pending' ? 'Overdue' : bill.status}
                     </span>
                   </td>
-                  <td style={{ padding: '12px', fontSize: '12px', color: '#1e293b' }}>{bill.notes}</td>
+                  <td style={{ padding: '12px', fontSize: '12px' }}>{bill.notes}</td>
                   <td style={{ padding: '12px' }}>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       {bill.status === 'Pending' && (
@@ -282,7 +282,7 @@ export default function Bills() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -295,7 +295,7 @@ export default function Bills() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -310,7 +310,7 @@ export default function Bills() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -322,7 +322,7 @@ export default function Bills() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -334,7 +334,7 @@ export default function Bills() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b',
+                fontSize: '16px',
                 gridColumn: 'span 2'
               }}
             />
@@ -349,7 +349,7 @@ export default function Bills() {
               border: 'none',
               cursor: 'pointer',
               fontWeight: '600',
-              fontSize: '16px', color: '#1e293b'
+              fontSize: '16px'
             }}
           >
             ✅ Record Bill
@@ -427,20 +427,20 @@ export default function Bills() {
                 borderRadius: '8px'
               }}>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: '14px' }}>Bill ID</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>{previewBill.id}</p>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Bill ID</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.id}</p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: '14px' }}>Date</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>{previewBill.date}</p>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Date</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.date}</p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: '14px' }}>Supplier</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>{previewBill.supplier}</p>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Supplier</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.supplier}</p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', color: '#1e293b', fontSize: '14px' }}>Due Date</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>{previewBill.dueDate}</p>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Due Date</p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.dueDate}</p>
                 </div>
               </div>
 
@@ -451,8 +451,8 @@ export default function Bills() {
                 marginBottom: '24px'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <p style={{ margin: 0, fontSize: '18px', color: '#1e293b' }}>Total Amount</p>
-                  <p style={{ margin: 0, fontSize: '32px', fontWeight: 'bold', color: '#1e293b' }}>
+                  <p style={{ margin: 0, fontSize: '18px' }}>Total Amount</p>
+                  <p style={{ margin: 0, fontSize: '32px', fontWeight: 'bold' }}>
                     {formatCurrency(previewBill.total)}
                   </p>
                 </div>

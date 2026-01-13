@@ -167,7 +167,7 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -180,7 +180,7 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -194,7 +194,7 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -208,7 +208,7 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -222,7 +222,7 @@ export default function Inventory() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
           </div>
@@ -236,7 +236,7 @@ export default function Inventory() {
               border: 'none',
               cursor: 'pointer',
               fontWeight: '600',
-              fontSize: '16px', color: '#1e293b'
+              fontSize: '16px'
             }}
           >
             ➕ Add Item

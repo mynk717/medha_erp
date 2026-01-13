@@ -163,7 +163,7 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -176,7 +176,7 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <select
@@ -187,7 +187,7 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             >
               <option value="">Select Item *</option>
@@ -208,7 +208,7 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
             <input
@@ -223,7 +223,7 @@ export default function Purchases() {
                 padding: '14px',
                 border: '2px solid #cbd5e1',
                 borderRadius: '8px',
-                fontSize: '16px', color: '#1e293b'
+                fontSize: '16px'
               }}
             />
           </div>
@@ -240,7 +240,7 @@ export default function Purchases() {
               border: 'none',
               cursor: 'pointer',
               fontWeight: '600',
-              fontSize: '16px', color: '#1e293b'
+              fontSize: '16px'
             }}
           >
             ✅ Record Purchase
