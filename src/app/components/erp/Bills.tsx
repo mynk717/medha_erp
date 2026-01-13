@@ -18,6 +18,7 @@ export default function Bills() {
   const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewBill, setPreviewBill] = useState<Bill | null>(null);
+  const [businessSettings, setBusinessSettings] = useState<any>(null);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     supplier: '',
@@ -28,8 +29,22 @@ export default function Bills() {
 
   useEffect(() => {
     loadBills();
+    loadBusinessSettings();
   }, []);
 
+  const loadBusinessSettings = async () => {
+    try {
+      const response = await fetch('/api/settings');
+      if (!response.ok) {
+        throw new Error('Failed to load settings');
+      }
+      const data = await response.json();
+      setBusinessSettings(data.settings);
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+  };
+  
   const loadBills = async () => {
     try {
       const sheets = GoogleSheetsService.getInstance();
@@ -417,8 +432,41 @@ export default function Bills() {
             {/* Bill Preview Content */}
             <div style={{ padding: '40px' }} className="print-content">
               <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-                <h1 style={{ color: '#1e293b', margin: '0 0 8px 0' }}>BILL</h1>
-                <p style={{ color: '#1e293b', margin: 0 }}>Medha Sanitary & Hardware</p>
+                {businessSettings?.logo && (
+                  <img 
+                    src={businessSettings.logo} 
+                    alt="Business Logo" 
+                    style={{ 
+                      maxHeight: '80px', 
+                      marginBottom: '16px',
+                      objectFit: 'contain'
+                    }} 
+                  />
+                )}
+                <h1 style={{ color: '#1e293b', margin: '0 0 12px 0', fontSize: '28px', fontWeight: '700' }}>
+                  BILL
+                </h1>
+                <p style={{ 
+                  color: '#1e293b', 
+                  margin: '0 0 4px 0', 
+                  fontSize: '18px', 
+                  fontWeight: '600' 
+                }}>
+                  {businessSettings?.businessName || 'Business Name'}
+                </p>
+                <p style={{ color: '#64748b', margin: '0 0 4px 0', fontSize: '14px' }}>
+                  {businessSettings?.address || ''}
+                </p>
+                {businessSettings?.gstNumber && (
+                  <p style={{ color: '#64748b', margin: '0 0 4px 0', fontSize: '13px' }}>
+                    GST: {businessSettings.gstNumber}
+                  </p>
+                )}
+                {businessSettings?.phone && (
+                  <p style={{ color: '#64748b', margin: 0, fontSize: '13px' }}>
+                    Phone: {businessSettings.phone}
+                  </p>
+                )}
               </div>
 
               <div style={{ 
@@ -427,57 +475,115 @@ export default function Bills() {
                 gap: '24px',
                 marginBottom: '32px',
                 padding: '20px',
-                background: '#1e293b',
-                borderRadius: '8px'
+                background: '#f8fafc',
+                borderRadius: '8px',
+                border: '2px solid #e2e8f0'
               }}>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Bill ID</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.id}</p>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#64748b', fontWeight: '500' }}>
+                    Bill ID
+                  </p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>
+                    {previewBill.id}
+                  </p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Date</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.date}</p>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#64748b', fontWeight: '500' }}>
+                    Date
+                  </p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>
+                    {previewBill.date}
+                  </p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Supplier</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.supplier}</p>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#64748b', fontWeight: '500' }}>
+                    Supplier
+                  </p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>
+                    {previewBill.supplier}
+                  </p>
                 </div>
                 <div>
-                  <p style={{ margin: '0 0 8px 0', fontSize: '14px' }}>Due Date</p>
-                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px' }}>{previewBill.dueDate}</p>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#64748b', fontWeight: '500' }}>
+                    Due Date
+                  </p>
+                  <p style={{ margin: 0, fontWeight: '600', fontSize: '16px', color: '#1e293b' }}>
+                    {previewBill.dueDate}
+                  </p>
                 </div>
               </div>
 
               <div style={{ 
-                padding: '20px',
-                background: '#1e293b',
-                borderRadius: '8px',
-                marginBottom: '24px'
+                padding: '24px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                borderRadius: '12px',
+                marginBottom: '24px',
+                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <p style={{ margin: 0, fontSize: '18px' }}>Total Amount</p>
-                  <p style={{ margin: 0, fontSize: '32px', fontWeight: 'bold' }}>
+                  <p style={{ margin: 0, fontSize: '18px', color: '#ffffff', fontWeight: '500' }}>
+                    Total Amount
+                  </p>
+                  <p style={{ margin: 0, fontSize: '36px', fontWeight: 'bold', color: '#ffffff' }}>
                     {formatCurrency(previewBill.total)}
                   </p>
                 </div>
               </div>
 
               {previewBill.notes && (
-                <div style={{ padding: '16px', background: '#fef3c7', borderRadius: '8px', borderLeft: '4px solid #f59e0b' }}>
-                  <p style={{ margin: '0 0 4px 0', fontWeight: '600', color: '#92400e' }}>Notes:</p>
-                  <p style={{ margin: 0, color: '#78350f' }}>{previewBill.notes}</p>
+                <div style={{ 
+                  padding: '16px', 
+                  background: '#fef3c7', 
+                  borderRadius: '8px', 
+                  borderLeft: '4px solid #f59e0b',
+                  marginBottom: '24px'
+                }}>
+                  <p style={{ margin: '0 0 6px 0', fontWeight: '600', color: '#92400e', fontSize: '14px' }}>
+                    Notes:
+                  </p>
+                  <p style={{ margin: 0, color: '#78350f', fontSize: '14px', lineHeight: '1.6' }}>
+                    {previewBill.notes}
+                  </p>
+                </div>
+              )}
+
+              {businessSettings?.invoiceTerms && (
+                <div style={{ 
+                  padding: '16px', 
+                  background: '#f1f5f9', 
+                  borderRadius: '8px',
+                  marginBottom: '24px',
+                  border: '1px solid #cbd5e1'
+                }}>
+                  <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#1e293b', fontSize: '14px' }}>
+                    Terms & Conditions:
+                  </p>
+                  <p style={{ 
+                    margin: 0, 
+                    color: '#475569', 
+                    fontSize: '12px', 
+                    lineHeight: '1.6',
+                    whiteSpace: 'pre-line'
+                  }}>
+                    {businessSettings.invoiceTerms}
+                  </p>
                 </div>
               )}
 
               <div style={{ 
-                marginTop: '32px', 
+                marginTop: '40px', 
                 paddingTop: '16px', 
-                borderTop: '1px solid #e5e7eb',
+                borderTop: '2px solid #e5e7eb',
                 fontSize: '12px',
-                color: '#1e293b',
+                color: '#64748b',
                 textAlign: 'center'
               }}>
-                <p style={{ margin: 0 }}>Generated by Medha ERP System</p>
+                <p style={{ margin: '0 0 4px 0', fontWeight: '500' }}>
+                  Thank you for your business!
+                </p>
+                <p style={{ margin: 0 }}>
+                  Generated by Medha ERP System
+                </p>
               </div>
             </div>
 
@@ -494,11 +600,12 @@ export default function Bills() {
                 style={{
                   background: '#8b5cf6',
                   color: 'white',
-                  padding: '10px 20px',
+                  padding: '12px 24px',
                   borderRadius: '8px',
                   border: 'none',
                   cursor: 'pointer',
                   fontWeight: '600',
+                  fontSize: '14px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
@@ -512,11 +619,12 @@ export default function Bills() {
                 style={{
                   background: '#3b82f6',
                   color: 'white',
-                  padding: '10px 20px',
+                  padding: '12px 24px',
                   borderRadius: '8px',
                   border: 'none',
                   cursor: 'pointer',
                   fontWeight: '600',
+                  fontSize: '14px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'

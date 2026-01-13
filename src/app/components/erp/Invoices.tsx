@@ -43,27 +43,32 @@ export default function Invoices() {
 
   const loadSettings = async () => {
     try {
-      const sheets = GoogleSheetsService.getInstance();
-      const settingsData = await sheets.getRange('Settings!A2:I2');
-      if (settingsData.length > 0) {
-        const row = settingsData[0];
-        const settings: BusinessSettings = {
-          name: row[0] || 'Medha Sanitary & Hardware',
-          gstNumber: row[1] || '',
-          phone: row[2] || '',
-          address: row[3] || '',
-          stateCode: row[4] || '',
-          logo: row[5] || '',
-          invoiceTerms: row[6] || '',
-          gstEnabled: row[7] === 'true' || row[7] === true,
-          defaultGstRate: parseFloat(row[8]) || 18
-        };
-        setBusinessSettings(settings);
+      const response = await fetch('/api/settings');
+      if (!response.ok) {
+        throw new Error('Failed to load settings');
       }
+      const data = await response.json();
+      
+      // Map API response to BusinessSettings format
+      const settings: BusinessSettings = {
+        name: data.settings.businessName || 'Business Name',
+        gstNumber: data.settings.gstNumber || '',
+        phone: data.settings.phone || '',
+        address: data.settings.address || '',
+        stateCode: data.settings.stateCode || '',
+        logo: data.settings.logo || '',
+        invoiceTerms: data.settings.invoiceTerms || '',
+        gstEnabled: data.settings.gstEnabled ?? true,
+        defaultGstRate: data.settings.defaultGstRate || 18
+      };
+      
+      setBusinessSettings(settings);
     } catch (error) {
       console.error('Error loading settings:', error);
+      alert('Please configure business settings first!');
     }
   };
+  
 
   const generateInvoice = (sale: Sale) => {
     if (!businessSettings) {
